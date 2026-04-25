@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { ArrowUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ThemeToggle from "./ThemeToggle";
+import MusicToggle from "./MusicToggle";
 
 const navLinks = [
   { label: "Services", href: "#services" },
@@ -58,6 +59,7 @@ export default function Navbar() {
 
           {/* Right side: Theme Toggle + CTA */}
           <div className="hidden md:flex items-center gap-3">
+            <MusicToggle />
             <ThemeToggle />
             <a
               href="#contact"
@@ -70,6 +72,7 @@ export default function Navbar() {
 
           {/* Mobile: Theme Toggle + Hamburger */}
           <div className="flex items-center gap-2 md:hidden">
+            <MusicToggle />
             <ThemeToggle />
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
