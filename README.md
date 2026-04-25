@@ -91,7 +91,7 @@ Available variables:
 - `SMTP_PASS` — Gmail App Password, not your normal Gmail password.
 - `SMTP_FROM_EMAIL` — Optional sender email override. Defaults to `SMTP_USER`.
 - `CONTACT_FROM_EMAIL` — Optional sender identity shown in the email. Example: `Bornworks <yourgmail@gmail.com>`.
-- `CONTACT_TO_EMAIL` — Optional destination inbox. Defaults to `jasmineadlina@gmail.com`.
+- `CONTACT_TO_EMAIL` — Optional destination inbox. Use commas for multiple recipients. Defaults to `jasmine.adlina@gmail.com`.
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 

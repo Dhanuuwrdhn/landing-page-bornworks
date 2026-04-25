@@ -30,6 +30,17 @@ function isValidConfiguredEmail(value: string | undefined) {
   return Boolean(value && isValidEmail(extractEmailAddress(value)));
 }
 
+function parseRecipientList(value: string | undefined) {
+  if (!value) {
+    return [];
+  }
+
+  return value
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
 function escapeHtml(value: string) {
   return value
     .replaceAll("&", "&amp;")
@@ -124,7 +135,7 @@ async function sendViaSmtp({
   text,
   replyTo,
 }: {
-  to: string;
+  to: string[];
   from: string;
   subject: string;
   html: string;
@@ -139,7 +150,7 @@ async function sendViaSmtp({
 
   await transporter.sendMail({
     from,
-    to,
+    to: to.join(", "),
     subject,
     html,
     text,
@@ -216,7 +227,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: true });
     }
 
-    const contactToEmail = process.env.CONTACT_TO_EMAIL || "jasmineadlina@gmail.com";
+    const contactToRecipients = parseRecipientList(
+      process.env.CONTACT_TO_EMAIL || "jasmine.adlina@gmail.com"
+    );
     const contactFromEmail =
       process.env.CONTACT_FROM_EMAIL || process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER;
 
@@ -231,12 +244,15 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!isValidConfiguredEmail(contactToEmail)) {
+    if (
+      contactToRecipients.length === 0 ||
+      contactToRecipients.some((recipient) => !isValidConfiguredEmail(recipient))
+    ) {
       return NextResponse.json(
         {
           ok: false,
           code: "invalid_to_email",
-          message: "CONTACT_TO_EMAIL is not a valid email address.",
+          message: "CONTACT_TO_EMAIL must contain one or more valid email addresses.",
         },
         { status: 500 }
       );
@@ -254,7 +270,7 @@ export async function POST(request: Request) {
     }
 
     await sendViaSmtp({
-      to: contactToEmail,
+      to: contactToRecipients,
       from: contactFromEmail,
       subject: message.subject,
       html: message.html,
@@ -275,7 +291,7 @@ export async function POST(request: Request) {
       smtpPort: process.env.SMTP_PORT || "465",
       contactFromEmail:
         process.env.CONTACT_FROM_EMAIL ?? process.env.SMTP_FROM_EMAIL ?? process.env.SMTP_USER ?? null,
-      contactToEmail: process.env.CONTACT_TO_EMAIL ?? "jasmineadlina@gmail.com",
+      contactToEmail: process.env.CONTACT_TO_EMAIL ?? "jasmine.adlina@gmail.com",
     });
 
     return NextResponse.json(
