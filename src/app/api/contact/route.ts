@@ -33,6 +33,18 @@ function normalizeText(value: string) {
   return value.trim().replace(/\r\n/g, "\n");
 }
 
+function normalizeErrorMessage(error: unknown) {
+  if (error instanceof Error && error.message.trim()) {
+    return error.message.trim();
+  }
+
+  return "Unable to process the contact request.";
+}
+
+function isValidConfiguredEmail(value: string | undefined) {
+  return Boolean(value && isValidEmail(value.replace(/^.*<([^>]+)>.*$/, "$1").trim()));
+}
+
 function buildEmailMarkup({
   name,
   email,
@@ -107,7 +119,7 @@ async function sendViaResend({
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`Resend delivery failed: ${errorText}`);
+    throw new Error(`Resend delivery failed (${response.status}): ${errorText}`);
   }
 }
 
@@ -195,6 +207,28 @@ export async function POST(request: Request) {
       );
     }
 
+    if (!isValidConfiguredEmail(contactToEmail)) {
+      return NextResponse.json(
+        {
+          ok: false,
+          code: "invalid_to_email",
+          message: "CONTACT_TO_EMAIL is not a valid email address.",
+        },
+        { status: 500 }
+      );
+    }
+
+    if (!isValidConfiguredEmail(contactFromEmail)) {
+      return NextResponse.json(
+        {
+          ok: false,
+          code: "invalid_from_email",
+          message: "CONTACT_FROM_EMAIL must be a valid sender address such as Bornworks <hello@bornworks.id>.",
+        },
+        { status: 500 }
+      );
+    }
+
     await sendViaResend({
       to: contactToEmail,
       from: contactFromEmail,
@@ -205,11 +239,22 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ ok: true });
-  } catch {
+  } catch (error) {
+    const message = normalizeErrorMessage(error);
+
+    console.error("[contact-form] delivery failed", {
+      message,
+      hasResendApiKey: Boolean(process.env.RESEND_API_KEY),
+      hasWebhookUrl: Boolean(process.env.CONTACT_FORM_WEBHOOK_URL),
+      contactFromEmail: process.env.CONTACT_FROM_EMAIL ?? null,
+      contactToEmail: process.env.CONTACT_TO_EMAIL ?? "hello@bornworks.id",
+    });
+
     return NextResponse.json(
       {
         ok: false,
-        message: "Unable to process the contact request.",
+        code: "delivery_failed",
+        message,
       },
       { status: 500 }
     );
