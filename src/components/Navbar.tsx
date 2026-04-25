@@ -16,11 +16,33 @@ const navLinks = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState("");
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  /* ── Active section detection via IntersectionObserver ── */
+  useEffect(() => {
+    const sectionIds = ["services", "portfolio", "about", "contact"];
+    const observers: IntersectionObserver[] = [];
+
+    sectionIds.forEach((id) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const obs = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) setActiveSection(`#${id}`);
+        },
+        { rootMargin: "-40% 0px -55% 0px" }
+      );
+      obs.observe(el);
+      observers.push(obs);
+    });
+
+    return () => observers.forEach((o) => o.disconnect());
   }, []);
 
   return (
@@ -45,19 +67,33 @@ export default function Navbar() {
 
           {/* Desktop Nav */}
           <div className="hidden items-center gap-1 md:flex">
-            {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                id={`nav-${link.label.toLowerCase()}`}
-                className="relative px-4 py-2 text-sm font-medium text-brand-dark/70 dark:text-white/60 hover:text-brand-dark dark:hover:text-white transition-colors rounded-lg hover:bg-brand-amber/5"
-              >
-                {link.label}
-              </a>
-            ))}
+            {navLinks.map((link) => {
+              const isActive = activeSection === link.href;
+              return (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  id={`nav-${link.label.toLowerCase()}`}
+                  className={`relative px-4 py-2 text-sm font-medium transition-colors rounded-lg ${
+                    isActive
+                      ? "text-brand-amber"
+                      : "text-brand-dark/70 dark:text-white/60 hover:text-brand-dark dark:hover:text-white hover:bg-brand-amber/5"
+                  }`}
+                >
+                  {link.label}
+                  {isActive && (
+                    <motion.span
+                      layoutId="nav-active"
+                      className="absolute inset-x-2 -bottom-0.5 h-0.5 bg-brand-amber rounded-full"
+                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                    />
+                  )}
+                </a>
+              );
+            })}
           </div>
 
-          {/* Right side: Theme Toggle + CTA */}
+          {/* Right side: Music + Theme Toggle + CTA */}
           <div className="hidden md:flex items-center gap-3">
             <MusicToggle />
             <ThemeToggle />
@@ -70,7 +106,7 @@ export default function Navbar() {
             </a>
           </div>
 
-          {/* Mobile: Theme Toggle + Hamburger */}
+          {/* Mobile: Music + Theme Toggle + Hamburger */}
           <div className="flex items-center gap-2 md:hidden">
             <MusicToggle />
             <ThemeToggle />
@@ -112,7 +148,11 @@ export default function Navbar() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className="block rounded-lg px-4 py-3 text-sm font-medium text-brand-dark/80 dark:text-white/70 hover:bg-brand-amber/10 hover:text-brand-dark dark:hover:text-white transition-colors"
+                  className={`block rounded-lg px-4 py-3 text-sm font-medium transition-colors ${
+                    activeSection === link.href
+                      ? "text-brand-amber bg-brand-amber/10"
+                      : "text-brand-dark/80 dark:text-white/70 hover:bg-brand-amber/10 hover:text-brand-dark dark:hover:text-white"
+                  }`}
                 >
                   {link.label}
                 </a>

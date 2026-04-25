@@ -1,21 +1,121 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { ArrowUp, TrendingUp, Users, Star, ArrowRight } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import AnimatedSection from "./AnimatedSection";
 
+/* ── Animated Counter ─────────────────────────────────── */
+function Counter({ target, suffix = "" }: { target: number; suffix?: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-50px" });
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!inView) return;
+    let start = 0;
+    const duration = 1800;
+    const step = Math.ceil(target / (duration / 30));
+    const timer = setInterval(() => {
+      start += step;
+      if (start >= target) {
+        start = target;
+        clearInterval(timer);
+      }
+      setCount(start);
+    }, 30);
+    return () => clearInterval(timer);
+  }, [inView, target]);
+
+  return (
+    <span ref={ref}>
+      {count}
+      {suffix}
+    </span>
+  );
+}
+
+/* ── Typewriter Effect ────────────────────────────────── */
+const words = ["That Matter", "People Love", "That Scale"];
+
+function Typewriter() {
+  const [wordIndex, setWordIndex] = useState(0);
+  const [charIndex, setCharIndex] = useState(0);
+  const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    const current = words[wordIndex];
+    const speed = deleting ? 50 : 100;
+
+    const timer = setTimeout(() => {
+      if (!deleting && charIndex === current.length) {
+        // Pause at full word, then start deleting
+        setTimeout(() => setDeleting(true), 2000);
+        return;
+      }
+      if (deleting && charIndex === 0) {
+        setDeleting(false);
+        setWordIndex((prev) => (prev + 1) % words.length);
+        return;
+      }
+      setCharIndex((prev) => prev + (deleting ? -1 : 1));
+    }, speed);
+
+    return () => clearTimeout(timer);
+  }, [charIndex, deleting, wordIndex]);
+
+  return (
+    <span className="relative z-10 text-brand-amber">
+      {words[wordIndex].slice(0, charIndex)}
+      <motion.span
+        animate={{ opacity: [1, 0] }}
+        transition={{ duration: 0.6, repeat: Infinity }}
+        className="inline-block w-[3px] h-[0.85em] bg-brand-amber ml-0.5 align-middle rounded-full"
+      />
+    </span>
+  );
+}
+
+/* ── Dot Grid Background ──────────────────────────────── */
+function DotGrid() {
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-[0.35] dark:opacity-[0.15]">
+      <svg width="100%" height="100%">
+        <defs>
+          <pattern
+            id="dot-pattern"
+            x="0"
+            y="0"
+            width="32"
+            height="32"
+            patternUnits="userSpaceOnUse"
+          >
+            <circle cx="2" cy="2" r="1" fill="currentColor" className="text-brand-dark/20" />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#dot-pattern)" />
+      </svg>
+    </div>
+  );
+}
+
+/* ── Stats Data ───────────────────────────────────────── */
 const stats = [
-  { icon: TrendingUp, value: "12+", label: "Projects Launched" },
-  { icon: Users, value: "8+", label: "Happy Clients" },
-  { icon: Star, value: "2+", label: "Years Experience" },
+  { icon: TrendingUp, value: 12, suffix: "+", label: "Projects Launched" },
+  { icon: Users, value: 8, suffix: "+", label: "Happy Clients" },
+  { icon: Star, value: 2, suffix: "+", label: "Years Experience" },
 ];
 
+/* ── Hero Component ───────────────────────────────────── */
 export default function Hero() {
   return (
     <section
       id="hero"
       className="relative overflow-hidden gradient-hero pt-28 pb-20 md:pt-40 md:pb-32"
     >
+      {/* Dot grid pattern */}
+      <DotGrid />
+
       {/* Decorative background elements */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-20 right-10 w-72 h-72 bg-brand-amber/10 rounded-full blur-3xl animate-pulse-slow" />
@@ -52,12 +152,12 @@ export default function Hero() {
             </div>
           </AnimatedSection>
 
-          {/* Headline */}
+          {/* Headline with Typewriter */}
           <AnimatedSection delay={0.1}>
             <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-brand-dark dark:text-white sm:text-5xl md:text-6xl lg:text-7xl max-w-4xl">
               We Build Digital Products{" "}
               <span className="relative">
-                <span className="relative z-10 text-brand-amber">That Matter</span>
+                <Typewriter />
                 <span className="absolute inset-x-0 bottom-1 h-3 bg-brand-amber/15 rounded-sm -z-0 md:h-4 md:bottom-2" />
               </span>
             </h1>
@@ -92,7 +192,7 @@ export default function Hero() {
             </div>
           </AnimatedSection>
 
-          {/* Stats Card */}
+          {/* Stats Card with Animated Counters */}
           <AnimatedSection delay={0.4}>
             <div className="mt-16 w-full max-w-2xl">
               <div className="glass rounded-3xl p-6 md:p-8 amber-glow">
@@ -108,7 +208,7 @@ export default function Hero() {
                           <Icon className="w-5 h-5 text-brand-amber" />
                         </div>
                         <span className="text-2xl font-bold text-brand-dark dark:text-white md:text-3xl">
-                          {stat.value}
+                          <Counter target={stat.value} suffix={stat.suffix} />
                         </span>
                         <span className="mt-1 text-xs font-medium text-brand-muted dark:text-white/50 md:text-sm">
                           {stat.label}

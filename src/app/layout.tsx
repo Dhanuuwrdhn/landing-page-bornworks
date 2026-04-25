@@ -1,5 +1,12 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
+
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
 
 export const metadata: Metadata = {
   title: "bornworks — Where Products Are Born",
@@ -12,13 +19,28 @@ export const metadata: Metadata = {
     "SaaS",
     "bornworks",
     "digital product",
+    "Indonesia",
   ],
   openGraph: {
     title: "bornworks — Where Products Are Born",
     description:
       "From idea to launch — we craft web apps, mobile apps, and SaaS platforms.",
     type: "website",
+    siteName: "bornworks",
+    locale: "en_US",
+    url: "https://bornworks.id",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "bornworks — Where Products Are Born",
+    description:
+      "From idea to launch — we craft web apps, mobile apps, and SaaS platforms.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  metadataBase: new URL("https://bornworks.id"),
 };
 
 export default function RootLayout({
@@ -27,19 +49,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full antialiased scroll-smooth">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
-          rel="stylesheet"
-        />
-      </head>
+    <html lang="en" className={`${inter.variable} h-full antialiased scroll-smooth`}>
       <body className="min-h-full flex flex-col bg-white text-brand-dark font-sans">
         {children}
       </body>
