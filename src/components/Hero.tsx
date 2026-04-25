@@ -50,12 +50,6 @@ function Typewriter() {
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    setWordIndex(0);
-    setCharIndex(0);
-    setDeleting(false);
-  }, [lang]);
-
-  useEffect(() => {
     const current = words[wordIndex];
     const speed = deleting ? 50 : 100;
 
@@ -164,7 +158,7 @@ export default function Hero() {
             <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-brand-dark dark:text-white sm:text-5xl md:text-6xl lg:text-7xl max-w-4xl">
               {t.headline[lang]}{" "}
               <span className="relative">
-                <Typewriter />
+                <Typewriter key={lang} />
                 <span className="absolute inset-x-0 bottom-1 h-3 bg-brand-amber/15 rounded-sm -z-0 md:h-4 md:bottom-2" />
               </span>
             </h1>

@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, ReactNode, useContext, useSyncExternalStore } from "react";
 
 type Lang = "en" | "id";
 
@@ -14,26 +14,34 @@ const LanguageContext = createContext<LanguageContextType>({
   toggleLang: () => {},
 });
 
-export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLang] = useState<Lang>("en");
+function subscribe(callback: () => void) {
+  window.addEventListener("storage", callback);
+  window.addEventListener("language-change", callback);
 
-  useEffect(() => {
-    const saved = localStorage.getItem("lang") as Lang | null;
-    if (saved === "en" || saved === "id") setLang(saved);
-  }, []);
+  return () => {
+    window.removeEventListener("storage", callback);
+    window.removeEventListener("language-change", callback);
+  };
+}
+
+function getLanguageSnapshot(): Lang {
+  const saved = localStorage.getItem("lang");
+  return saved === "id" ? "id" : "en";
+}
+
+export function LanguageProvider({ children }: { children: ReactNode }) {
+  const lang = useSyncExternalStore<Lang>(subscribe, getLanguageSnapshot, () => "en");
 
   const toggleLang = () => {
-    setLang((prev) => {
-      const next = prev === "en" ? "id" : "en";
-      localStorage.setItem("lang", next);
-      return next;
-    });
+    const next = lang === "en" ? "id" : "en";
+    localStorage.setItem("lang", next);
+    window.dispatchEvent(new Event("language-change"));
   };
 
+  const value: LanguageContextType = { lang, toggleLang };
+
   return (
-    <LanguageContext.Provider value={{ lang, toggleLang }}>
-      {children}
-    </LanguageContext.Provider>
+    <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>
   );
 }
 

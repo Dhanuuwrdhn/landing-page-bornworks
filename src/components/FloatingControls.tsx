@@ -1,18 +1,21 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useRef, useEffect, useCallback, useState, useSyncExternalStore } from "react";
 import { Volume2, VolumeX, Languages } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLang } from "@/contexts/LanguageContext";
 
+function subscribe() {
+  return () => {};
+}
+
 export default function FloatingControls() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(subscribe, () => true, () => false);
   const { lang, toggleLang } = useLang();
 
   useEffect(() => {
-    setMounted(true);
     const audio = new Audio("/music/background-music.mp3");
     audio.loop = true;
     audio.volume = 0.3;
