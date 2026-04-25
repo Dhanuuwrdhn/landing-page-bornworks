@@ -4,19 +4,31 @@ import { useState, useEffect } from "react";
 import { ArrowUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ThemeToggle from "./ThemeToggle";
-import MusicToggle from "./MusicToggle";
+import { useLang } from "@/contexts/LanguageContext";
 
-const navLinks = [
-  { label: "Services", href: "#services" },
-  { label: "Portfolio", href: "#portfolio" },
-  { label: "About", href: "#about" },
-  { label: "Contact", href: "#contact" },
-];
+const navLinks = {
+  en: [
+    { label: "Services", href: "#services" },
+    { label: "Portfolio", href: "#portfolio" },
+    { label: "About", href: "#about" },
+    { label: "Contact", href: "#contact" },
+  ],
+  id: [
+    { label: "Layanan", href: "#services" },
+    { label: "Portofolio", href: "#portfolio" },
+    { label: "Tentang", href: "#about" },
+    { label: "Kontak", href: "#contact" },
+  ],
+};
+
+const cta = { en: "Start a Project", id: "Mulai Project" };
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
+  const { lang } = useLang();
+  const links = navLinks[lang];
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -24,11 +36,9 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  /* ── Active section detection via IntersectionObserver ── */
   useEffect(() => {
     const sectionIds = ["services", "portfolio", "about", "contact"];
     const observers: IntersectionObserver[] = [];
-
     sectionIds.forEach((id) => {
       const el = document.getElementById(id);
       if (!el) return;
@@ -41,7 +51,6 @@ export default function Navbar() {
       obs.observe(el);
       observers.push(obs);
     });
-
     return () => observers.forEach((o) => o.disconnect());
   }, []);
 
@@ -54,7 +63,6 @@ export default function Navbar() {
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between md:h-20">
-          {/* Logo */}
           <a href="#" className="flex items-center gap-2 group" id="navbar-logo">
             <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-brand-amber/10 group-hover:bg-brand-amber/20 transition-colors">
               <ArrowUp className="w-5 h-5 text-brand-amber" strokeWidth={2.5} />
@@ -65,15 +73,14 @@ export default function Navbar() {
             </span>
           </a>
 
-          {/* Desktop Nav */}
           <div className="hidden items-center gap-1 md:flex">
-            {navLinks.map((link) => {
+            {links.map((link) => {
               const isActive = activeSection === link.href;
               return (
                 <a
                   key={link.href}
                   href={link.href}
-                  id={`nav-${link.label.toLowerCase()}`}
+                  id={`nav-${link.href.slice(1)}`}
                   className={`relative px-4 py-2 text-sm font-medium transition-colors rounded-lg ${
                     isActive
                       ? "text-brand-amber"
@@ -93,22 +100,18 @@ export default function Navbar() {
             })}
           </div>
 
-          {/* Right side: Music + Theme Toggle + CTA */}
           <div className="hidden md:flex items-center gap-3">
-            <MusicToggle />
             <ThemeToggle />
             <a
               href="#contact"
               id="nav-cta"
               className="inline-flex items-center gap-2 rounded-xl bg-brand-amber px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand-amber/25 hover:bg-brand-amber-dark hover:shadow-brand-amber/40 transition-all duration-300"
             >
-              Start a Project
+              {cta[lang]}
             </a>
           </div>
 
-          {/* Mobile: Music + Theme Toggle + Hamburger */}
           <div className="flex items-center gap-2 md:hidden">
-            <MusicToggle />
             <ThemeToggle />
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
@@ -133,7 +136,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
@@ -143,7 +145,7 @@ export default function Navbar() {
             className="glass-strong overflow-hidden md:hidden"
           >
             <div className="px-4 py-4 space-y-1">
-              {navLinks.map((link) => (
+              {links.map((link) => (
                 <a
                   key={link.href}
                   href={link.href}
@@ -162,7 +164,7 @@ export default function Navbar() {
                 onClick={() => setMobileOpen(false)}
                 className="mt-2 block rounded-xl bg-brand-amber px-4 py-3 text-center text-sm font-semibold text-white shadow-lg shadow-brand-amber/25"
               >
-                Start a Project
+                {cta[lang]}
               </a>
             </div>
           </motion.div>
