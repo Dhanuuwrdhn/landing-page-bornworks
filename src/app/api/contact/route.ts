@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import nodemailer from "nodemailer";
 
 type ContactPayload = {
   name?: unknown;
@@ -20,6 +21,15 @@ function isValidEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
+function extractEmailAddress(value: string) {
+  const match = value.match(/<([^>]+)>/);
+  return (match?.[1] ?? value).trim();
+}
+
+function isValidConfiguredEmail(value: string | undefined) {
+  return Boolean(value && isValidEmail(extractEmailAddress(value)));
+}
+
 function escapeHtml(value: string) {
   return value
     .replaceAll("&", "&amp;")
@@ -39,10 +49,6 @@ function normalizeErrorMessage(error: unknown) {
   }
 
   return "Unable to process the contact request.";
-}
-
-function isValidConfiguredEmail(value: string | undefined) {
-  return Boolean(value && isValidEmail(value.replace(/^.*<([^>]+)>.*$/, "$1").trim()));
 }
 
 function buildEmailMarkup({
@@ -86,7 +92,31 @@ function buildEmailMarkup({
   };
 }
 
-async function sendViaResend({
+function createTransporter() {
+  const smtpHost = process.env.SMTP_HOST || "smtp.gmail.com";
+  const smtpPort = Number(process.env.SMTP_PORT || "465");
+  const smtpSecure = process.env.SMTP_SECURE
+    ? process.env.SMTP_SECURE === "true"
+    : smtpPort === 465;
+  const smtpUser = process.env.SMTP_USER;
+  const smtpPass = process.env.SMTP_PASS;
+
+  if (!smtpUser || !smtpPass) {
+    return null;
+  }
+
+  return nodemailer.createTransport({
+    host: smtpHost,
+    port: smtpPort,
+    secure: smtpSecure,
+    auth: {
+      user: smtpUser,
+      pass: smtpPass,
+    },
+  });
+}
+
+async function sendViaSmtp({
   to,
   from,
   subject,
@@ -101,26 +131,20 @@ async function sendViaResend({
   text: string;
   replyTo: string;
 }) {
-  const response = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from,
-      to: [to],
-      subject,
-      html,
-      text,
-      reply_to: replyTo,
-    }),
-  });
+  const transporter = createTransporter();
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Resend delivery failed (${response.status}): ${errorText}`);
+  if (!transporter) {
+    throw new Error("SMTP is not configured. Please set SMTP_USER and SMTP_PASS.");
   }
+
+  await transporter.sendMail({
+    from,
+    to,
+    subject,
+    html,
+    text,
+    replyTo,
+  });
 }
 
 async function sendViaWebhook({
@@ -192,16 +216,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: true });
     }
 
-    const resendApiKey = process.env.RESEND_API_KEY;
-    const contactToEmail = process.env.CONTACT_TO_EMAIL || "hello@bornworks.id";
-    const contactFromEmail = process.env.CONTACT_FROM_EMAIL;
+    const contactToEmail = process.env.CONTACT_TO_EMAIL || "jasmineadlina@gmail.com";
+    const contactFromEmail =
+      process.env.CONTACT_FROM_EMAIL || process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER;
 
-    if (!resendApiKey || !contactFromEmail) {
+    if (!contactFromEmail) {
       return NextResponse.json(
         {
           ok: false,
           code: "delivery_unavailable",
-          message: "Contact delivery is not configured.",
+          message: "Email delivery is not configured. Please set SMTP credentials first.",
         },
         { status: 503 }
       );
@@ -223,13 +247,13 @@ export async function POST(request: Request) {
         {
           ok: false,
           code: "invalid_from_email",
-          message: "CONTACT_FROM_EMAIL must be a valid sender address such as Bornworks <hello@bornworks.id>.",
+          message: "CONTACT_FROM_EMAIL must be a valid sender address.",
         },
         { status: 500 }
       );
     }
 
-    await sendViaResend({
+    await sendViaSmtp({
       to: contactToEmail,
       from: contactFromEmail,
       subject: message.subject,
@@ -244,10 +268,14 @@ export async function POST(request: Request) {
 
     console.error("[contact-form] delivery failed", {
       message,
-      hasResendApiKey: Boolean(process.env.RESEND_API_KEY),
       hasWebhookUrl: Boolean(process.env.CONTACT_FORM_WEBHOOK_URL),
-      contactFromEmail: process.env.CONTACT_FROM_EMAIL ?? null,
-      contactToEmail: process.env.CONTACT_TO_EMAIL ?? "hello@bornworks.id",
+      hasSmtpUser: Boolean(process.env.SMTP_USER),
+      hasSmtpPass: Boolean(process.env.SMTP_PASS),
+      smtpHost: process.env.SMTP_HOST || "smtp.gmail.com",
+      smtpPort: process.env.SMTP_PORT || "465",
+      contactFromEmail:
+        process.env.CONTACT_FROM_EMAIL ?? process.env.SMTP_FROM_EMAIL ?? process.env.SMTP_USER ?? null,
+      contactToEmail: process.env.CONTACT_TO_EMAIL ?? "jasmineadlina@gmail.com",
     });
 
     return NextResponse.json(

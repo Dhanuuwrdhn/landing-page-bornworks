@@ -23,7 +23,7 @@
 - **Glassmorphism Design** — Frosted glass cards with `backdrop-blur`, subtle borders, and layered transparency
 - **Dark / Light Mode** — Toggle with animated Sun/Moon icon, persisted to `localStorage`, respects system preference
 - **Background Music** — Optional ambient music toggle with animated volume indicator
-- **Validated Contact Form** — Bilingual project inquiry form with client/server validation and email or webhook delivery
+- **Validated Contact Form** — Bilingual project inquiry form with client/server validation and SMTP or webhook delivery
 - **Scroll Animations** — Framer Motion-powered fade-up reveals on every section
 - **Fully Responsive** — Mobile-first with animated hamburger menu
 - **Zero Emoji** — All visual indicators use [Lucide React](https://lucide.dev) icons
@@ -84,9 +84,14 @@ cp .env.example .env.local
 Available variables:
 
 - `CONTACT_FORM_WEBHOOK_URL` — Optional. If set, contact form submissions are sent to this webhook.
-- `RESEND_API_KEY` — Required when not using a webhook and sending via Resend API.
-- `CONTACT_FROM_EMAIL` — Required when using Resend. Example: `Bornworks <hello@bornworks.id>`.
-- `CONTACT_TO_EMAIL` — Optional destination inbox. Defaults to `hello@bornworks.id`.
+- `SMTP_HOST` — SMTP host. For Gmail use `smtp.gmail.com`.
+- `SMTP_PORT` — SMTP port. For Gmail SSL use `465`.
+- `SMTP_SECURE` — `true` for SSL SMTP.
+- `SMTP_USER` — Your Gmail address used to authenticate SMTP.
+- `SMTP_PASS` — Gmail App Password, not your normal Gmail password.
+- `SMTP_FROM_EMAIL` — Optional sender email override. Defaults to `SMTP_USER`.
+- `CONTACT_FROM_EMAIL` — Optional sender identity shown in the email. Example: `Bornworks <yourgmail@gmail.com>`.
+- `CONTACT_TO_EMAIL` — Optional destination inbox. Defaults to `jasmineadlina@gmail.com`.
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
