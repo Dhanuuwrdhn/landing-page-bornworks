@@ -25,8 +25,6 @@ export default function FloatingWhatsApp() {
       whileTap={{ scale: 0.95 }}
     >
       <MessageCircle className="w-6 h-6" fill="white" strokeWidth={0} />
-      {/* Ping animation */}
-      <span className="absolute inset-0 rounded-full bg-[#25D366]/40 animate-ping" />
     </motion.a>
   );
 }
