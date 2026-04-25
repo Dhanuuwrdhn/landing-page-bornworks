@@ -1,36 +1,130 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<p align="center">
+  <strong>↑ born</strong><span style="color:#F59E0B"><strong>works</strong></span>
+</p>
+
+<h3 align="center">Where Products Are Born</h3>
+
+<p align="center">
+  A modern, glassmorphism landing page for <strong>bornworks</strong> — a software house that builds digital products that matter.
+</p>
+
+<p align="center">
+  <a href="#features">Features</a> •
+  <a href="#tech-stack">Tech Stack</a> •
+  <a href="#getting-started">Getting Started</a> •
+  <a href="#project-structure">Structure</a> •
+  <a href="#deployment">Deployment</a>
+</p>
+
+---
+
+## Features
+
+- **Glassmorphism Design** — Frosted glass cards with `backdrop-blur`, subtle borders, and layered transparency
+- **Dark / Light Mode** — Toggle with animated Sun/Moon icon, persisted to `localStorage`, respects system preference
+- **Background Music** — Optional ambient music toggle with animated volume indicator
+- **Scroll Animations** — Framer Motion-powered fade-up reveals on every section
+- **Fully Responsive** — Mobile-first with animated hamburger menu
+- **Zero Emoji** — All visual indicators use [Lucide React](https://lucide.dev) icons
+- **SEO Ready** — Proper meta tags, semantic HTML, heading hierarchy
+
+## Sections
+
+| # | Section | Description |
+|---|---------|-------------|
+| 1 | **Navbar** | Sticky glass nav with brand wordmark, music/theme toggles, CTA |
+| 2 | **Hero** | Bold headline, tagline badge, dual CTA buttons, floating stats card |
+| 3 | **Services** | 3 glass cards — Web App, Mobile, SaaS |
+| 4 | **Process** | 4-step timeline (Discovery → Design → Build → Ship) |
+| 5 | **Portfolio** | Project showcase cards with tech tags |
+| 6 | **Why Us** | Value propositions — Startup Mindset, Full Ownership, Honest Communication |
+| 7 | **CTA** | Full-width glass panel with amber glow |
+| 8 | **Footer** | Dark navy footer with navigation and contact info |
+
+## Tech Stack
+
+| Technology | Version | Purpose |
+|---|---|---|
+| [Next.js](https://nextjs.org) | 16 | React meta-framework (App Router) |
+| [TypeScript](https://typescriptlang.org) | 5 | Type safety |
+| [Tailwind CSS](https://tailwindcss.com) | 4 | Utility-first styling (CSS-based config) |
+| [Framer Motion](https://motion.dev) | 12 | Scroll-triggered animations |
+| [Lucide React](https://lucide.dev) | 1.11 | Icon system |
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js **18+** (recommended: 20+)
+- npm, yarn, pnpm, or bun
+
+### Installation
 
 ```bash
+# Clone the repository
+git clone https://github.com/danusprout/landing-page-bornworks.git
+cd landing-page-bornworks
+
+# Install dependencies
+npm install
+
+# Start development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Build
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm start
+```
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/
+├── app/
+│   ├── globals.css          # Tailwind v4 theme, glass utilities, dark mode
+│   ├── layout.tsx           # Root layout with Inter font + SEO metadata
+│   └── page.tsx             # Landing page assembly
+├── components/
+│   ├── AnimatedSection.tsx   # Reusable fade-up scroll wrapper
+│   ├── Navbar.tsx            # Sticky glass navbar
+│   ├── Hero.tsx              # Hero section with stats
+│   ├── Services.tsx          # Service cards
+│   ├── Process.tsx           # Process timeline
+│   ├── Portfolio.tsx         # Project showcase
+│   ├── WhyUs.tsx             # Value propositions
+│   ├── CTA.tsx               # Call-to-action panel
+│   ├── Footer.tsx            # Footer
+│   ├── ThemeToggle.tsx       # Dark/light mode toggle
+│   └── MusicToggle.tsx       # Background music toggle
+public/
+└── music/
+    └── background-music.mp3  # Ambient background music
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Brand
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Token | Value |
+|---|---|
+| Primary | `#F59E0B` (Amber) |
+| Dark | `#111827` (Navy) |
+| Light | `#F9FAFB` |
+| Muted | `#6B7280` |
+| Font | [Inter](https://fonts.google.com/specimen/Inter) |
 
-## Deploy on Vercel
+## Deployment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This project is optimized for [Vercel](https://vercel.com):
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Push to GitHub
+2. Import repo at [vercel.com/new](https://vercel.com/new)
+3. Framework preset: **Next.js** (auto-detected)
+4. Deploy
+
+## License
+
+© 2026 bornworks. PT Lahir Karya Semesta. All rights reserved.
