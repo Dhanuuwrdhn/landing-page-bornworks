@@ -1,72 +1,274 @@
 "use client";
 
+import { useEffect, useRef, useState, useCallback } from "react";
 import { ExternalLink } from "lucide-react";
-import AnimatedSection from "./AnimatedSection";
+import { motion, AnimatePresence } from "framer-motion";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useLang } from "@/contexts/LanguageContext";
 
+/* ── Translations ─────────────────────────────────────── */
 const t = {
-  label: { en: "Portfolio", id: "Portofolio" },
-  heading: { en: "Recently Shipped", id: "Baru Dirilis" },
-  sub: {
-    en: "Real products we built and launched for our clients.",
-    id: "Produk nyata yang kami bangun dan rilis untuk klien kami.",
-  },
-  view: { en: "View Project", id: "Lihat Project" },
+  label: { en: "Portfolio",     id: "Portofolio"    },
+  view:  { en: "View Project",  id: "Lihat Project" },
 };
 
+/* ── Data ─────────────────────────────────────────────── */
 const projects = {
   en: [
-    { title: "Financial Planning App", description: "A comprehensive personal finance management app with budgeting tools, expense tracking, and investment portfolio insights. Built for Android with a beautiful Material Design interface.", tags: ["Android", "Flutter"], gradient: "from-amber-400/20 to-orange-300/20 dark:from-amber-400/10 dark:to-orange-300/10" },
-    { title: "Company Profile + CMS", description: "A modern company profile website with a fully-featured content management system. SEO-optimized, blazing-fast page loads, and intuitive admin dashboard for non-technical teams.", tags: ["Next.js", "TypeScript"], gradient: "from-blue-400/20 to-indigo-300/20 dark:from-blue-400/10 dark:to-indigo-300/10" },
+    { title: "Financial Planning App",     description: "Personal finance management with budgeting, expense tracking, and investment portfolio insights. Built for Android.", tags: ["Android", "Flutter"],   accent: "from-amber-400 to-orange-500",   bg: "from-amber-100  to-orange-100  dark:from-amber-900/40  dark:to-orange-900/40"  },
+    { title: "Company Profile + CMS",      description: "SEO-optimised company website with headless CMS, blazing-fast page loads, and an intuitive admin dashboard.",        tags: ["Next.js", "TypeScript"], accent: "from-blue-400 to-indigo-500",    bg: "from-blue-100   to-indigo-100  dark:from-blue-900/40   dark:to-indigo-900/40"  },
+    { title: "Restaurant Ordering System", description: "QR-based ordering with real-time kitchen display, table management, and integrated payment gateway.",                tags: ["Vue.js", "Express"],     accent: "from-emerald-400 to-teal-500",  bg: "from-emerald-100 to-teal-100  dark:from-emerald-900/40 dark:to-teal-900/40"   },
+    { title: "SaaS Analytics Dashboard",   description: "Real-time analytics with role-based access, custom charts, and webhook integrations for a B2B SaaS startup.",       tags: ["React", "Node.js"],      accent: "from-violet-400 to-purple-500", bg: "from-violet-100 to-purple-100 dark:from-violet-900/40  dark:to-purple-900/40" },
   ],
   id: [
-    { title: "Aplikasi Perencanaan Keuangan", description: "Aplikasi manajemen keuangan pribadi dengan fitur budgeting, pelacakan pengeluaran, dan insight portofolio investasi. Dibangun untuk Android dengan antarmuka Material Design yang indah.", tags: ["Android", "Flutter"], gradient: "from-amber-400/20 to-orange-300/20 dark:from-amber-400/10 dark:to-orange-300/10" },
-    { title: "Company Profile + CMS", description: "Website company profile modern dengan sistem manajemen konten lengkap. SEO-optimized, loading super cepat, dan dashboard admin intuitif untuk tim non-teknis.", tags: ["Next.js", "TypeScript"], gradient: "from-blue-400/20 to-indigo-300/20 dark:from-blue-400/10 dark:to-indigo-300/10" },
+    { title: "Aplikasi Perencanaan Keuangan", description: "Manajemen keuangan pribadi dengan budgeting, pelacakan pengeluaran, dan insight portofolio investasi.",           tags: ["Android", "Flutter"],   accent: "from-amber-400 to-orange-500",   bg: "from-amber-100  to-orange-100  dark:from-amber-900/40  dark:to-orange-900/40"  },
+    { title: "Company Profile + CMS",         description: "Website company profile dengan headless CMS, loading super cepat, dan dashboard admin intuitif.",                tags: ["Next.js", "TypeScript"], accent: "from-blue-400 to-indigo-500",    bg: "from-blue-100   to-indigo-100  dark:from-blue-900/40   dark:to-indigo-900/40"  },
+    { title: "Sistem Pemesanan Restoran",      description: "Pemesanan berbasis QR dengan tampilan dapur real-time, manajemen meja, dan pembayaran terintegrasi.",            tags: ["Vue.js", "Express"],     accent: "from-emerald-400 to-teal-500",  bg: "from-emerald-100 to-teal-100  dark:from-emerald-900/40 dark:to-teal-900/40"   },
+    { title: "Dashboard Analitik SaaS",       description: "Analitik real-time dengan akses berbasis peran, grafik kustom, dan integrasi webhook untuk startup B2B.",        tags: ["React", "Node.js"],      accent: "from-violet-400 to-purple-500", bg: "from-violet-100 to-purple-100 dark:from-violet-900/40  dark:to-purple-900/40" },
   ],
 };
 
+/* ── Image panel variants (film-camera slide) ─────────── */
+// direction > 0 → advancing: old exits LEFT, new enters from RIGHT
+// direction < 0 → retreating: old exits RIGHT, new enters from LEFT
+const filmVariants = {
+  initial: (d: number) => ({ x: d > 0 ? "100%" : "-100%" }),
+  animate: { x: "0%" },
+  exit:    (d: number) => ({ x: d > 0 ? "-105%" : "105%" }),
+};
+
+/* ── SlipWords — light-year text reveal ───────────────── */
+// Each word is clipped inside an overflow:hidden span.
+// The inner motion.span rushes from below (y 115%→0) with a slight
+// initial rotation that snaps to 0 — the "light-year" feel comes from
+// the aggressive exponential-out ease and the per-word stagger.
+// Only the ENTER is animated here; the container handles the EXIT.
+function SlipWords({ text, baseDelay = 0 }: { text: string; baseDelay?: number }) {
+  return (
+    <>
+      {text.split(" ").map((word, i) => (
+        <span
+          key={i}
+          style={{ display: "inline-block", overflow: "hidden", lineHeight: 1.15 }}
+        >
+          <motion.span
+            style={{ display: "inline-block" }}
+            initial={{ y: "118%", rotate: 3 }}
+            animate={{ y: "0%",   rotate: 0 }}
+            transition={{
+              duration: 0.65,
+              delay: baseDelay + i * 0.048,
+              ease: [0.16, 1, 0.3, 1], // expo-out — fast rush, soft settle
+            }}
+          >
+            {word}&nbsp;
+          </motion.span>
+        </span>
+      ))}
+    </>
+  );
+}
+
+/* ── Component ────────────────────────────────────────── */
 export default function Portfolio() {
   const { lang } = useLang();
+  const list = projects[lang];
+  const N    = list.length;
+
+  const sectionRef = useRef<HTMLElement>(null);
+  const stRef      = useRef<ScrollTrigger | null>(null);
+  const prevRef    = useRef(0);
+  const goToRef    = useRef<(i: number) => void>(() => {});
+
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [direction,   setDirection]   = useState<1 | -1>(1);
+
+  const goTo = useCallback((idx: number) => {
+    const c = Math.max(0, Math.min(N - 1, idx));
+    setDirection(c >= prevRef.current ? 1 : -1);
+    prevRef.current = c;
+    setActiveIndex(c);
+  }, [N]);
+
+  // Keep a stable ref so ScrollTrigger never holds a stale closure
+  useEffect(() => { goToRef.current = goTo; }, [goTo]);
+
+  /* ── GSAP ScrollTrigger: pins the section, drives the index ── */
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const ctx = gsap.context(() => {
+      stRef.current = ScrollTrigger.create({
+        trigger: section,
+        start: "top top",
+        end: `+=${(N - 1) * 900}`,
+        pin: true,
+        snap: {
+          snapTo: 1 / (N - 1),
+          duration: { min: 0.3, max: 0.6 },
+          ease: "power2.inOut",
+          delay: 0.05,
+        },
+        onUpdate: (self) => {
+          const idx = Math.round(self.progress * (N - 1));
+          if (idx !== prevRef.current) goToRef.current(idx);
+        },
+      });
+    }, section);
+
+    return () => ctx.revert();
+  }, [N]);
+
+  /* ── Keyboard ── */
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => {
+      if (e.key === "ArrowDown" || e.key === "ArrowRight") goTo(activeIndex + 1);
+      if (e.key === "ArrowUp"   || e.key === "ArrowLeft")  goTo(activeIndex - 1);
+    };
+    window.addEventListener("keydown", h);
+    return () => window.removeEventListener("keydown", h);
+  }, [activeIndex, goTo]);
+
+  const scrollTo = (i: number) => {
+    const st = stRef.current;
+    if (!st) return;
+    window.scrollTo({ top: st.start + (i / (N - 1)) * (st.end - st.start), behavior: "smooth" });
+  };
+
+  const project = list[activeIndex];
 
   return (
-    <section id="portfolio" className="relative py-24 md:py-32 bg-white dark:bg-[#0a0e1a]">
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/2 left-0 w-80 h-80 bg-brand-amber/5 rounded-full blur-3xl -translate-y-1/2" />
-      </div>
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <AnimatedSection>
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <span className="inline-block text-sm font-semibold uppercase tracking-widest text-brand-amber mb-4">{t.label[lang]}</span>
-            <h2 className="text-3xl font-bold text-brand-dark dark:text-white sm:text-4xl lg:text-5xl">{t.heading[lang]}</h2>
-            <p className="mt-4 text-brand-muted dark:text-white/50 text-lg">{t.sub[lang]}</p>
-          </div>
-        </AnimatedSection>
-        <div className="grid gap-8 md:grid-cols-2">
-          {projects[lang].map((project, index) => (
-            <AnimatedSection key={index} delay={index * 0.15}>
-              <div className="glass-card rounded-3xl overflow-hidden h-full group">
-                <div className={`h-48 md:h-56 bg-gradient-to-br ${project.gradient} relative flex items-center justify-center`}>
-                  <div className="glass rounded-2xl px-8 py-6">
-                    <span className="text-lg font-bold text-brand-dark dark:text-white">{project.title}</span>
-                  </div>
-                </div>
-                <div className="p-8">
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {project.tags.map((tag) => (
-                      <span key={tag} className="inline-flex items-center rounded-lg bg-brand-amber/10 px-3 py-1 text-xs font-semibold text-brand-amber-dark dark:text-brand-amber">{tag}</span>
-                    ))}
-                  </div>
-                  <h3 className="text-xl font-bold text-brand-dark dark:text-white mb-3">{project.title}</h3>
-                  <p className="text-brand-muted dark:text-white/50 leading-relaxed mb-6">{project.description}</p>
-                  <button className="inline-flex items-center gap-2 text-sm font-semibold text-brand-amber hover:text-brand-amber-dark transition-colors group/link" id={`portfolio-project-${index + 1}`}>
-                    {t.view[lang]}
-                    <ExternalLink className="w-4 h-4 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform" />
-                  </button>
-                </div>
+    <section
+      ref={sectionRef}
+      id="portfolio"
+      className="relative bg-white dark:bg-[#0a0e1a]"
+      style={{ minHeight: "100vh" }}
+    >
+      <div className="flex" style={{ height: "100vh" }}>
+
+        {/* ── LEFT: image panel — film-camera horizontal slide ── */}
+        <div className="relative w-[55%] overflow-hidden">
+          <AnimatePresence mode="sync" custom={direction}>
+            <motion.div
+              key={activeIndex}
+              custom={direction}
+              variants={filmVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={{ duration: 0.75, ease: [0.76, 0, 0.24, 1] }}
+              className={`absolute inset-0 bg-gradient-to-br ${project.bg} flex items-center justify-center`}
+            >
+              {/* Faint number watermark */}
+              <span
+                className="absolute bottom-10 right-10 font-black leading-none pointer-events-none select-none"
+                style={{ fontSize: "clamp(100px,14vw,200px)", color: "rgba(0,0,0,0.04)" }}
+              >
+                {String(activeIndex + 1).padStart(2, "0")}
+              </span>
+
+              {/* Decorative accent shapes */}
+              <div className="relative">
+                <div className={`w-52 h-52 rounded-[2rem] bg-gradient-to-br ${project.accent} shadow-2xl shadow-black/20`} />
+                <div className={`absolute -bottom-6 -right-6 w-32 h-32 rounded-2xl bg-gradient-to-br ${project.accent} opacity-40`} />
+                <div className={`absolute -top-6  -left-6  w-20 h-20 rounded-xl   bg-gradient-to-br ${project.accent} opacity-25`} />
               </div>
-            </AnimatedSection>
-          ))}
+            </motion.div>
+          </AnimatePresence>
         </div>
+
+        {/* ── RIGHT: text panel ── */}
+        <div className="relative w-[45%] overflow-hidden">
+
+          {/* Static label — always visible */}
+          <div className="absolute top-12 left-14 z-10">
+            <span className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-amber">
+              {t.label[lang]}
+            </span>
+          </div>
+
+          {/* Animated text block:
+              - Whole container: scrolls upward on exit (y 0 → -6%), enters from below (y 6% → 0)
+              - Title words: individual light-year slip on enter
+              - Description + CTA: staggered fade after title lands            */}
+          <AnimatePresence mode="sync">
+            <motion.div
+              key={activeIndex}
+              className="absolute inset-0 flex flex-col justify-center px-14 gap-5"
+              initial={{ y: "6%",  opacity: 0 }}
+              animate={{ y: "0%",  opacity: 1 }}
+              exit={{    y: "-6%", opacity: 0 }}
+              transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+            >
+              {/* Tags */}
+              <div className="flex flex-wrap gap-2">
+                {project.tags.map((tag, i) => (
+                  <motion.span
+                    key={tag}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.07, duration: 0.35, ease: "easeOut" }}
+                    className="rounded-lg bg-brand-amber/10 px-3 py-1 text-xs font-semibold text-brand-amber-dark dark:text-brand-amber"
+                  >
+                    {tag}
+                  </motion.span>
+                ))}
+              </div>
+
+              {/* Title — word-by-word light-year slip */}
+              <h2 className="text-4xl lg:text-5xl xl:text-[3.25rem] font-extrabold leading-[1.06] text-brand-dark dark:text-white">
+                <SlipWords text={project.title} baseDelay={0.05} />
+              </h2>
+
+              {/* Description — slides in as a single block after title settles */}
+              <motion.p
+                className="text-base leading-relaxed text-brand-muted dark:text-white/50 max-w-sm"
+                initial={{ y: 22, opacity: 0 }}
+                animate={{ y: 0,  opacity: 1 }}
+                transition={{ delay: 0.32, duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+              >
+                {project.description}
+              </motion.p>
+
+              {/* CTA */}
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.48, duration: 0.4, ease: "easeOut" }}
+              >
+                <button className="group inline-flex items-center gap-2 text-sm font-semibold text-brand-amber hover:text-brand-amber-dark transition-colors">
+                  {t.view[lang]}
+                  <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                </button>
+              </motion.div>
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Static footer: dot indicators + counter */}
+          <div className="absolute bottom-12 left-14 right-14 flex items-center justify-between z-10">
+            <div className="flex items-center gap-2.5">
+              {list.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => scrollTo(i)}
+                  aria-label={`Project ${i + 1}`}
+                  className={`rounded-full transition-all duration-300 ${
+                    i === activeIndex
+                      ? "w-7 h-2 bg-brand-amber"
+                      : "w-2 h-2 bg-brand-dark/15 dark:bg-white/15 hover:bg-brand-dark/30 dark:hover:bg-white/30"
+                  }`}
+                />
+              ))}
+            </div>
+            <span className="text-xs font-medium tabular-nums text-brand-muted/50 dark:text-white/25">
+              {String(activeIndex + 1).padStart(2, "0")} / {String(N).padStart(2, "0")}
+            </span>
+          </div>
+        </div>
+
       </div>
     </section>
   );

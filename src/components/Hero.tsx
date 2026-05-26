@@ -1,42 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { ArrowUp, TrendingUp, Users, Star, ArrowRight } from "lucide-react";
-import { motion, useInView } from "framer-motion";
-import AnimatedSection from "./AnimatedSection";
+import { useEffect, useState } from "react";
+import { ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
 import { useLang } from "@/contexts/LanguageContext";
 
-/* ── Animated Counter ─────────────────────────────────── */
-function Counter({ target, suffix = "" }: { target: number; suffix?: string }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-50px" });
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    if (!inView) return;
-    let start = 0;
-    const duration = 1800;
-    const step = Math.ceil(target / (duration / 30));
-    const timer = setInterval(() => {
-      start += step;
-      if (start >= target) {
-        start = target;
-        clearInterval(timer);
-      }
-      setCount(start);
-    }, 30);
-    return () => clearInterval(timer);
-  }, [inView, target]);
-
-  return (
-    <span ref={ref}>
-      {count}
-      {suffix}
-    </span>
-  );
-}
-
-/* ── Typewriter Effect ────────────────────────────────── */
+/* ── Typewriter ───────────────────────────────────────── */
 const wordsMap = {
   en: ["That Matter", "People Love", "That Scale"],
   id: ["Yang Bermakna", "Yang Disukai", "Yang Berkembang"],
@@ -52,7 +21,6 @@ function Typewriter() {
   useEffect(() => {
     const current = words[wordIndex];
     const speed = deleting ? 50 : 100;
-
     const timer = setTimeout(() => {
       if (!deleting && charIndex === current.length) {
         setTimeout(() => setDeleting(true), 2000);
@@ -65,145 +33,174 @@ function Typewriter() {
       }
       setCharIndex((prev) => prev + (deleting ? -1 : 1));
     }, speed);
-
     return () => clearTimeout(timer);
   }, [charIndex, deleting, wordIndex, words]);
 
   return (
-    <span className="relative z-10 text-brand-amber">
+    <span className="text-brand-amber">
       {words[wordIndex].slice(0, charIndex)}
       <motion.span
         animate={{ opacity: [1, 0] }}
         transition={{ duration: 0.6, repeat: Infinity }}
-        className="inline-block w-[3px] h-[0.85em] bg-brand-amber ml-0.5 align-middle rounded-full"
+        className="inline-block w-[3px] h-[0.85em] bg-brand-amber ml-1 align-middle rounded-sm"
       />
     </span>
   );
 }
 
-/* ── Dot Grid ─────────────────────────────────────────── */
-function DotGrid() {
+/* ── Crystal Glass Background ─────────────────────────── */
+// 8 overlapping parallelogram panels (skew S=70, width W=220).
+// Each has a vertical gradient: opaque colour at top → transparent at ~78% height.
+// Where panels overlap, opacity compounds — producing the darker triangular facets
+// visible in the reference image without needing explicit highlight polygons.
+// A white fade overlay on the bottom 40% cleans up the lower portion.
+function GeometricBg() {
   return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-[0.35] dark:opacity-[0.15]">
-      <svg width="100%" height="100%">
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 bg-white dark:bg-[#07090f]" />
+
+      <svg
+        className="absolute inset-0 w-full h-full dark:opacity-30"
+        viewBox="0 0 1440 900"
+        preserveAspectRatio="xMidYMid slice"
+        aria-hidden="true"
+      >
         <defs>
-          <pattern id="dot-pattern" x="0" y="0" width="32" height="32" patternUnits="userSpaceOnUse">
-            <circle cx="2" cy="2" r="1" fill="currentColor" className="text-brand-dark/20" />
-          </pattern>
+          {/* gradientUnits="userSpaceOnUse" — y coords are absolute SVG pixels */}
+          <linearGradient id="cp1" x1="0" y1="0" x2="0" y2="700" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.70" />
+            <stop offset="100%" stopColor="#FDE68A" stopOpacity="0" />
+          </linearGradient>
+          <linearGradient id="cp2" x1="0" y1="0" x2="0" y2="680" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="#F97316" stopOpacity="0.60" />
+            <stop offset="100%" stopColor="#FED7AA" stopOpacity="0" />
+          </linearGradient>
+          <linearGradient id="cp3" x1="0" y1="0" x2="0" y2="710" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="#EC4899" stopOpacity="0.55" />
+            <stop offset="100%" stopColor="#FBCFE8" stopOpacity="0" />
+          </linearGradient>
+          <linearGradient id="cp4" x1="0" y1="0" x2="0" y2="700" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="#A855F7" stopOpacity="0.55" />
+            <stop offset="100%" stopColor="#EDE9FE" stopOpacity="0" />
+          </linearGradient>
+          <linearGradient id="cp5" x1="0" y1="0" x2="0" y2="690" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="#7C3AED" stopOpacity="0.60" />
+            <stop offset="100%" stopColor="#DDD6FE" stopOpacity="0" />
+          </linearGradient>
+          <linearGradient id="cp6" x1="0" y1="0" x2="0" y2="720" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.65" />
+            <stop offset="100%" stopColor="#DBEAFE" stopOpacity="0" />
+          </linearGradient>
+          <linearGradient id="cp7" x1="0" y1="0" x2="0" y2="730" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="#0EA5E9" stopOpacity="0.60" />
+            <stop offset="100%" stopColor="#E0F2FE" stopOpacity="0" />
+          </linearGradient>
+          <linearGradient id="cp8" x1="0" y1="0" x2="0" y2="740" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="#38BDF8" stopOpacity="0.55" />
+            <stop offset="100%" stopColor="#F0F9FF" stopOpacity="0" />
+          </linearGradient>
         </defs>
-        <rect width="100%" height="100%" fill="url(#dot-pattern)" />
+
+        {/* Panels — formula: "(bx+70),0  (bx+290),0  (bx+220),900  bx,900"  */}
+        <polygon points="-20,0  200,0  130,900  -90,900"   fill="url(#cp1)" />
+        <polygon points="140,0  360,0  290,900   70,900"   fill="url(#cp2)" />
+        <polygon points="300,0  520,0  450,900  230,900"   fill="url(#cp3)" />
+        <polygon points="460,0  680,0  610,900  390,900"   fill="url(#cp4)" />
+        <polygon points="620,0  840,0  770,900  550,900"   fill="url(#cp5)" />
+        <polygon points="780,0 1000,0  930,900  710,900"   fill="url(#cp6)" />
+        <polygon points="940,0 1160,0 1090,900  870,900"   fill="url(#cp7)" />
+        <polygon points="1100,0 1440,0 1440,900 1030,900"  fill="url(#cp8)" />
       </svg>
+
+      {/* Fade bottom 40% to white so text area is clean */}
+      <div className="absolute bottom-0 inset-x-0 h-[45%] bg-gradient-to-t from-white dark:from-[#07090f] to-transparent" />
     </div>
   );
 }
 
-/* ── Data ─────────────────────────────────────────────── */
+/* ── Translations ─────────────────────────────────────── */
 const t = {
   badge: { en: "Where Products Are Born", id: "Tempat Produk Dilahirkan" },
   headline: { en: "We Build Digital Products", id: "Kami Membangun Produk Digital" },
-  sub: {
+  sub1: {
     en: "From idea to launch — we craft web apps, mobile apps, and SaaS platforms.",
     id: "Dari ide hingga peluncuran — kami membangun web app, mobile app, dan platform SaaS.",
+  },
+  sub2: {
+    en: "All without slowing down your business.",
+    id: "Tanpa mengganggu bisnis utama Anda.",
   },
   cta1: { en: "Start a Project", id: "Mulai Project" },
   cta2: { en: "See Our Work", id: "Lihat Karya Kami" },
 };
 
-const statsT = {
-  en: [
-    { icon: TrendingUp, value: 12, suffix: "+", label: "Projects Launched" },
-    { icon: Users, value: 8, suffix: "+", label: "Happy Clients" },
-    { icon: Star, value: 2, suffix: "+", label: "Years Experience" },
-  ],
-  id: [
-    { icon: TrendingUp, value: 12, suffix: "+", label: "Project Diluncurkan" },
-    { icon: Users, value: 8, suffix: "+", label: "Klien Puas" },
-    { icon: Star, value: 2, suffix: "+", label: "Tahun Pengalaman" },
-  ],
-};
-
 /* ── Component ────────────────────────────────────────── */
 export default function Hero() {
   const { lang } = useLang();
-  const stats = statsT[lang];
 
   return (
-    <section id="hero" className="relative overflow-hidden gradient-hero pt-28 pb-20 md:pt-40 md:pb-32">
-      <DotGrid />
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-20 right-10 w-72 h-72 bg-brand-amber/10 rounded-full blur-3xl animate-pulse-slow" />
-        <div className="absolute bottom-20 left-10 w-96 h-96 bg-brand-amber/5 rounded-full blur-3xl" />
-        <motion.div animate={{ y: [-10, 10, -10] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }} className="absolute top-32 right-20 hidden lg:block">
-          <div className="w-14 h-14 rounded-2xl bg-brand-amber/10 flex items-center justify-center">
-            <ArrowUp className="w-7 h-7 text-brand-amber" strokeWidth={2} />
+    <section id="hero" className="relative overflow-hidden flex flex-col min-h-screen">
+      <GeometricBg />
+
+      {/* Content anchored to the bottom-left, matching the reference layout */}
+      <div className="relative flex-1 flex flex-col justify-end mx-auto w-full max-w-7xl px-6 sm:px-10 lg:px-16 pt-32 pb-14">
+        <motion.p
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="mb-5 text-xs font-semibold uppercase tracking-[0.18em] text-brand-amber"
+        >
+          {t.badge[lang]}
+        </motion.p>
+
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55, delay: 0.1 }}
+          className="text-5xl font-extrabold leading-[1.06] tracking-tight text-brand-dark dark:text-white sm:text-6xl lg:text-7xl xl:text-[5.25rem] max-w-3xl"
+        >
+          {t.headline[lang]}
+          <br />
+          <Typewriter key={lang} />
+        </motion.h1>
+
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, delay: 0.22 }}
+          className="mt-8 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-5 max-w-2xl">
+            <p className="text-sm leading-relaxed text-brand-muted dark:text-white/50 max-w-[260px]">
+              {t.sub1[lang]}
+            </p>
+            <ArrowRight className="w-4 h-4 mt-0.5 shrink-0 text-brand-dark/25 dark:text-white/20 hidden sm:block" />
+            <p className="text-sm leading-relaxed text-brand-muted dark:text-white/50 max-w-[180px]">
+              {t.sub2[lang]}
+            </p>
           </div>
-        </motion.div>
-        <motion.div animate={{ y: [10, -10, 10] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }} className="absolute bottom-40 left-16 hidden lg:block">
-          <div className="w-10 h-10 rounded-xl bg-brand-amber/8 flex items-center justify-center rotate-12">
-            <ArrowUp className="w-5 h-5 text-brand-amber/60" strokeWidth={2} />
+
+          <div className="flex gap-3 shrink-0">
+            <a
+              href="#contact"
+              id="hero-cta-primary"
+              className="group inline-flex items-center gap-2 rounded-xl bg-brand-amber px-6 py-3 text-sm font-semibold text-white hover:bg-brand-amber-dark transition-colors"
+            >
+              {t.cta1[lang]}
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+            </a>
+            <a
+              href="#portfolio"
+              id="hero-cta-secondary"
+              className="inline-flex items-center gap-2 rounded-xl border border-brand-dark/15 dark:border-white/15 px-6 py-3 text-sm font-semibold text-brand-dark dark:text-white hover:bg-brand-dark/5 dark:hover:bg-white/5 transition-colors"
+            >
+              {t.cta2[lang]}
+            </a>
           </div>
         </motion.div>
       </div>
 
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col items-center text-center">
-          <AnimatedSection>
-            <div className="inline-flex items-center gap-2 rounded-full bg-brand-amber/10 px-4 py-1.5 mb-8">
-              <ArrowUp className="w-4 h-4 text-brand-amber" strokeWidth={2.5} />
-              <span className="text-sm font-medium text-brand-amber-dark dark:text-brand-amber">{t.badge[lang]}</span>
-            </div>
-          </AnimatedSection>
-
-          <AnimatedSection delay={0.1}>
-            <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-brand-dark dark:text-white sm:text-5xl md:text-6xl lg:text-7xl max-w-4xl">
-              {t.headline[lang]}{" "}
-              <span className="relative">
-                <Typewriter key={lang} />
-                <span className="absolute inset-x-0 bottom-1 h-3 bg-brand-amber/15 rounded-sm -z-0 md:h-4 md:bottom-2" />
-              </span>
-            </h1>
-          </AnimatedSection>
-
-          <AnimatedSection delay={0.2}>
-            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-brand-muted dark:text-white/50 md:text-xl">{t.sub[lang]}</p>
-          </AnimatedSection>
-
-          <AnimatedSection delay={0.3}>
-            <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:gap-5">
-              <a href="#contact" id="hero-cta-primary" className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-brand-amber px-8 py-4 text-base font-semibold text-white shadow-xl shadow-brand-amber/30 hover:bg-brand-amber-dark hover:shadow-brand-amber/50 transition-all duration-300">
-                {t.cta1[lang]}
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </a>
-              <a href="#portfolio" id="hero-cta-secondary" className="inline-flex items-center justify-center gap-2 rounded-2xl border-2 border-brand-dark/20 dark:border-white/20 px-8 py-4 text-base font-semibold text-brand-dark dark:text-white hover:border-brand-dark/40 dark:hover:border-white/40 hover:bg-brand-dark/5 dark:hover:bg-white/5 transition-all duration-300">
-                {t.cta2[lang]}
-              </a>
-            </div>
-          </AnimatedSection>
-
-          <AnimatedSection delay={0.4}>
-            <div className="mt-16 w-full max-w-2xl">
-              <div className="glass rounded-3xl p-6 md:p-8 amber-glow">
-                <div className="grid grid-cols-3 divide-x divide-brand-dark/10 dark:divide-white/10">
-                  {stats.map((stat, index) => {
-                    const Icon = stat.icon;
-                    return (
-                      <div key={index} className="flex flex-col items-center px-2 md:px-6">
-                        <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-brand-amber/10">
-                          <Icon className="w-5 h-5 text-brand-amber" />
-                        </div>
-                        <span className="text-2xl font-bold text-brand-dark dark:text-white md:text-3xl">
-                          <Counter target={stat.value} suffix={stat.suffix} />
-                        </span>
-                        <span className="mt-1 text-xs font-medium text-brand-muted dark:text-white/50 md:text-sm">{stat.label}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          </AnimatedSection>
-        </div>
-      </div>
+      <div className="relative h-px w-full bg-brand-dark/8 dark:bg-white/8" />
     </section>
   );
 }
