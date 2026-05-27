@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect, useRef, useState, useCallback } from "react";
 import { Search, Pen, Code2, Rocket } from "lucide-react";
 import { motion } from "framer-motion";
+import { gsap } from "gsap";
 import { useLang } from "@/contexts/LanguageContext";
 
 /* ── Translations ─────────────────────────────────────── */
@@ -30,85 +32,104 @@ const steps = {
   ],
 };
 
-/* ── Per-step accent colours ──────────────────────────── */
-const COLORS = [
-  { accent: "#F59E0B", glow: "#F59E0B44", border: "#F59E0B66" },
-  { accent: "#EC4899", glow: "#EC489944", border: "#EC489966" },
-  { accent: "#A855F7", glow: "#A855F744", border: "#A855F766" },
-  { accent: "#3B82F6", glow: "#3B82F644", border: "#3B82F666" },
-];
+/* ── Colours ──────────────────────────────────────────── */
+const COLORS = ["#F59E0B", "#EC4899", "#A855F7", "#3B82F6"];
 
-/* ── Wave background ──────────────────────────────────── */
-function WaveBg() {
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      <div className="absolute inset-0 bg-[#f9f5f0] dark:bg-[#07090f] transition-colors" />
-
-      {/* Colorful wave layers — subtle in light mode, vivid in dark */}
-      <div className="absolute inset-0 opacity-25 dark:opacity-75">
-        <svg
-          className="absolute inset-0 w-full h-full"
-          viewBox="0 0 1440 700"
-          preserveAspectRatio="xMidYMid slice"
-          aria-hidden
-        >
-          <defs>
-            <linearGradient id="wv1" x1="0" y1="0" x2="1440" y2="0" gradientUnits="userSpaceOnUse">
-              <stop offset="0%"   stopColor="#F59E0B" stopOpacity="0.95" />
-              <stop offset="100%" stopColor="#F97316" stopOpacity="0.10" />
-            </linearGradient>
-            <linearGradient id="wv2" x1="0" y1="0" x2="1440" y2="0" gradientUnits="userSpaceOnUse">
-              <stop offset="0%"   stopColor="#EC4899" stopOpacity="0.10" />
-              <stop offset="50%"  stopColor="#A855F7" stopOpacity="0.90" />
-              <stop offset="100%" stopColor="#6366F1" stopOpacity="0.10" />
-            </linearGradient>
-            <linearGradient id="wv3" x1="0" y1="0" x2="1440" y2="0" gradientUnits="userSpaceOnUse">
-              <stop offset="0%"   stopColor="#3B82F6" stopOpacity="0.10" />
-              <stop offset="100%" stopColor="#0EA5E9" stopOpacity="0.90" />
-            </linearGradient>
-          </defs>
-          {/* Top wave — amber */}
-          <path
-            d="M0,90 Q180,20 360,90 Q540,160 720,90 Q900,20 1080,90 Q1260,160 1440,90 L1440,0 L0,0 Z"
-            fill="url(#wv1)"
-          />
-          {/* Mid band — pink → violet */}
-          <path
-            d="M0,370 Q240,290 480,370 Q720,450 960,370 Q1200,290 1440,370
-               L1440,250 Q1200,170 960,250 Q720,330 480,250 Q240,170 0,250 Z"
-            fill="url(#wv2)"
-          />
-          {/* Bottom wave — blue */}
-          <path
-            d="M0,620 Q360,545 720,620 Q1080,695 1440,620 L1440,700 L0,700 Z"
-            fill="url(#wv3)"
-          />
-        </svg>
-      </div>
-    </div>
-  );
-}
+/*
+  Straight full-viewport-width ribbon.
+  viewBox "0 0 1000 20", line at y=10.
+  The SVG is broken out of its container via
+  left:50% + translateX(-50%) + width:100vw so it runs
+  from the left to the right edge of the screen.
+  overflow-x-hidden on the section clips any bleed.
+*/
+const RIBBON = "M 0,10 L 1000,10";
 
 /* ── Component ────────────────────────────────────────── */
-// Grid height in px — controls zigzag proportions.
-// DOWN nodes (i=0,2): justify-end → circle bottom-anchored, y ≈ GRID_H − 28
-// UP   nodes (i=1,3): justify-start → circle top-anchored,  y ≈ 28
-const GRID_H = 380;
-const NODE_R = 28; // half of w-14 (56 px)
-
 export default function Process() {
   const { lang } = useLang();
   const list = steps[lang];
+  const N    = list.length;
+
+  const sectionRef = useRef<HTMLElement>(null);
+  const fillRef    = useRef<SVGPathElement>(null);
+  const lenRef     = useRef(0);
+  const prevRef    = useRef(-1);
+  const tweenRef   = useRef<gsap.core.Tween | null>(null);
+  const goToRef    = useRef<(n: number) => void>(() => {});
+
+  const [activeIndex, setActiveIndex] = useState(-1);
+
+  const goTo = useCallback((n: number) => {
+    prevRef.current = n;
+    setActiveIndex(n);
+  }, []);
+
+  useEffect(() => { goToRef.current = goTo; }, [goTo]);
+
+  /* ── Measure ribbon length once on mount ── */
+  useEffect(() => {
+    const fill = fillRef.current;
+    if (!fill) return;
+    const len = fill.getTotalLength();
+    lenRef.current = len;
+    gsap.set(fill, { strokeDasharray: len, strokeDashoffset: len });
+  }, []);
+
+  /* ── Animation: runs every time section enters viewport ── */
+  const playAnimation = useCallback(() => {
+    const fill = fillRef.current;
+    const len  = lenRef.current;
+    if (!fill || !len) return;
+
+    tweenRef.current?.kill();
+    prevRef.current = -1;
+    setActiveIndex(-1);
+    gsap.set(fill, { strokeDashoffset: len });
+
+    tweenRef.current = gsap.to(fill, {
+      strokeDashoffset: 0,
+      duration: 2.2,
+      ease: "power2.inOut",
+      onUpdate() {
+        const offset = gsap.getProperty(fill, "strokeDashoffset") as number;
+        const p      = 1 - offset / len;
+        let next = -1;
+        for (let i = N - 1; i >= 0; i--) {
+          if (p >= (i + 0.5) / N) { next = i; break; }
+        }
+        if (next !== prevRef.current) goToRef.current(next);
+      },
+    });
+  }, [N]);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) playAnimation(); },
+      { threshold: 0.25 },
+    );
+
+    observer.observe(section);
+    return () => {
+      observer.disconnect();
+      tweenRef.current?.kill();
+    };
+  }, [playAnimation]);
 
   return (
-    <section id="process" className="relative py-24 md:py-32 overflow-hidden">
-      <WaveBg />
+    <section
+      ref={sectionRef}
+      id="process"
+      className="relative py-24 md:py-32 bg-[#0d1117] overflow-x-hidden"
+    >
+      <div className="flex flex-col items-center gap-16 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
 
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-
-        {/* Header */}
+        {/* ── Header ── */}
         <motion.div
-          className="text-center max-w-2xl mx-auto mb-20"
+          className="text-center max-w-2xl"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -117,115 +138,165 @@ export default function Process() {
           <span className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-amber">
             {t.label[lang]}
           </span>
-          <h2 className="mt-3 text-4xl font-extrabold text-brand-dark dark:text-white sm:text-5xl">
+          <h2 className="mt-3 text-4xl font-extrabold text-white sm:text-5xl">
             {t.heading[lang]}
           </h2>
-          <p className="mt-4 text-brand-muted dark:text-white/50 text-lg">{t.sub[lang]}</p>
+          <p className="mt-4 text-white/45 text-lg">{t.sub[lang]}</p>
         </motion.div>
 
-        {/* ── Desktop zigzag ────────────────────────────── */}
-        <div
-          className="relative hidden md:grid grid-cols-4"
-          style={{ height: GRID_H }}
-        >
-          {/* Animated gradient connector */}
+        {/* ── Desktop: ribbon + cards ── */}
+        <div className="relative hidden md:block w-full" style={{ height: 300 }}>
+
+          {/*
+            Full-viewport-width SVG ribbon.
+            left:50% + translateX(-50%) centres the element relative to
+            the page (since this container is itself centred), so with
+            width:100vw the line runs from the exact left to right screen edge.
+            overflow-x-hidden on the section prevents a horizontal scrollbar.
+          */}
           <svg
-            className="absolute inset-0 w-full h-full pointer-events-none"
-            viewBox={`0 0 1000 ${GRID_H}`}
+            className="absolute pointer-events-none"
+            style={{
+              left: "50%",
+              top:  "50%",
+              transform: "translate(-50%, -50%)",
+              width: "100vw",
+              height: 20,
+            }}
+            viewBox="0 0 1000 20"
             preserveAspectRatio="none"
             aria-hidden
           >
             <defs>
-              <linearGradient id="connGrad" x1="0" y1="0" x2="1000" y2="0" gradientUnits="userSpaceOnUse">
+              <linearGradient id="ribGrad" x1="0" y1="0" x2="1000" y2="0" gradientUnits="userSpaceOnUse">
                 <stop offset="0%"   stopColor="#F59E0B" />
                 <stop offset="33%"  stopColor="#EC4899" />
                 <stop offset="66%"  stopColor="#A855F7" />
                 <stop offset="100%" stopColor="#3B82F6" />
               </linearGradient>
+              {/* Very subtle glow — just enough to feel lit */}
+              <filter id="lineGlow" x="0" y="-300%" width="100%" height="700%">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
             </defs>
-            {/*
-              Column centres (x): 125, 375, 625, 875
-              DOWN (i=0,2): y = GRID_H − NODE_R = 352
-              UP   (i=1,3): y = NODE_R           = 28
-            */}
-            <motion.path
-              d={`M 125,${GRID_H - NODE_R}
-                  C 250,${GRID_H - NODE_R} 250,${NODE_R} 375,${NODE_R}
-                  S 500,${GRID_H - NODE_R} 625,${GRID_H - NODE_R}
-                  S 750,${NODE_R} 875,${NODE_R}`}
+
+            {/* Dotted track — visible before animation runs */}
+            <path
+              d={RIBBON}
               fill="none"
-              stroke="url(#connGrad)"
+              stroke="rgba(255,255,255,0.1)"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeDasharray="4 10"
+            />
+            {/* Animated gradient fill */}
+            <path
+              ref={fillRef}
+              d={RIBBON}
+              fill="none"
+              stroke="url(#ribGrad)"
               strokeWidth="2"
-              strokeDasharray="8 5"
-              initial={{ pathLength: 0, opacity: 0 }}
-              whileInView={{ pathLength: 1, opacity: 0.65 }}
-              viewport={{ once: true }}
-              transition={{ duration: 1.8, ease: "easeInOut", delay: 0.5 }}
+              strokeLinecap="round"
+              filter="url(#lineGlow)"
             />
           </svg>
 
-          {/* Step nodes */}
-          {list.map((step, i) => {
-            const up   = i % 2 === 1;
-            const Icon = step.icon;
-            const c    = COLORS[i];
+          {/* Cards — solid, no blur */}
+          <div className="relative z-10 grid grid-cols-4 gap-5 h-full items-center">
+            {list.map((step, i) => {
+              const Icon   = step.icon;
+              const c      = COLORS[i];
+              const isLit  = i <= activeIndex;
+              const isCurr = i === activeIndex;
 
-            const textBlock = (
-              <div className={`${up ? "mt-5" : "mb-5"} text-center px-4`}>
-                <div
-                  className="flex h-9 w-9 mx-auto mb-2.5 items-center justify-center rounded-lg"
-                  style={{ background: c.accent + "1a", border: `1px solid ${c.accent}33` }}
+              return (
+                <motion.div
+                  key={i}
+                  className="flex flex-col items-center justify-center rounded-3xl p-6 text-center h-[230px]"
+                  animate={{
+                    y:     isCurr ? -10 : 0,
+                    scale: isCurr ? 1.04 : 1,
+                  }}
+                  transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                  style={{
+                    background: isLit
+                      ? `linear-gradient(150deg, #1c2030 0%, ${c}1e 100%)`
+                      : "#111520",
+                    border: `1px solid ${isLit ? c + "50" : "rgba(255,255,255,0.06)"}`,
+                    boxShadow: isCurr
+                      ? `0 16px 40px ${c}22, 0 0 0 1px ${c}28`
+                      : isLit
+                      ? `0 4px 18px ${c}14`
+                      : "none",
+                    transition: "background 0.5s, border-color 0.5s, box-shadow 0.5s",
+                  }}
                 >
-                  <Icon className="w-5 h-5" style={{ color: c.accent }} strokeWidth={1.8} />
-                </div>
-                <h3 className="text-sm font-bold text-brand-dark dark:text-white mb-1.5">
-                  {step.title}
-                </h3>
-                <p className="text-xs text-brand-muted dark:text-white/45 leading-relaxed">
-                  {step.description}
-                </p>
-              </div>
-            );
-
-            return (
-              <motion.div
-                key={i}
-                className={`flex flex-col items-center h-full ${up ? "justify-start" : "justify-end"}`}
-                initial={{ opacity: 0, y: up ? -28 : 28 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.55, delay: 0.2 + i * 0.14 }}
-              >
-                {/* Text above — only for DOWN steps */}
-                {!up && textBlock}
-
-                {/* Circle node */}
-                <div className="relative shrink-0">
+                  {/* Icon */}
                   <div
-                    className="absolute inset-0 rounded-full blur-xl"
-                    style={{ backgroundColor: c.glow, transform: "scale(2.2)" }}
-                  />
-                  <div
-                    className="relative w-14 h-14 rounded-full flex items-center justify-center text-white font-black text-lg"
+                    className="w-11 h-11 rounded-xl flex items-center justify-center mb-3"
                     style={{
-                      background: `linear-gradient(135deg, ${c.accent}ee 0%, ${c.accent}66 100%)`,
-                      border: `2px solid ${c.border}`,
-                      boxShadow: `0 0 30px ${c.glow}`,
+                      background: isLit ? c + "22" : "rgba(255,255,255,0.05)",
+                      transition: "background 0.5s",
                     }}
                   >
-                    {step.step}
+                    <Icon
+                      className="w-5 h-5"
+                      style={{ color: isLit ? c : "rgba(255,255,255,0.18)", transition: "color 0.5s" }}
+                      strokeWidth={1.8}
+                    />
                   </div>
-                </div>
 
-                {/* Text below — only for UP steps */}
-                {up && textBlock}
-              </motion.div>
-            );
-          })}
+                  {/* Step number */}
+                  <span
+                    className="text-[10px] font-black mb-1 tabular-nums"
+                    style={{ color: isLit ? c : "rgba(255,255,255,0.15)", transition: "color 0.5s" }}
+                  >
+                    {String(step.step).padStart(2, "0")}
+                  </span>
+
+                  {/* Title */}
+                  <h3
+                    className="font-extrabold text-sm mb-2 leading-tight"
+                    style={{ color: isLit ? "#fff" : "rgba(255,255,255,0.2)", transition: "color 0.5s" }}
+                  >
+                    {step.title}
+                  </h3>
+
+                  {/* Description */}
+                  <p
+                    className="text-[11px] leading-relaxed"
+                    style={{ color: isLit ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.12)", transition: "color 0.5s" }}
+                  >
+                    {step.description}
+                  </p>
+                </motion.div>
+              );
+            })}
+          </div>
         </div>
 
-        {/* ── Mobile: vertical list ─────────────────────── */}
-        <div className="md:hidden flex flex-col gap-7">
+        {/* ── Progress dots (desktop) ── */}
+        <div className="hidden md:flex items-center gap-2.5">
+          {list.map((_, i) => (
+            <div
+              key={i}
+              className="rounded-full"
+              style={{
+                width:      i <= activeIndex ? 24 : 8,
+                height:     6,
+                background: i <= activeIndex ? COLORS[i] : "rgba(255,255,255,0.1)",
+                transition: "width 0.4s ease, background 0.5s ease",
+              }}
+            />
+          ))}
+        </div>
+
+        {/* ── Mobile: vertical list ── */}
+        <div className="md:hidden w-full flex flex-col gap-6">
           {list.map((step, i) => {
             const Icon = step.icon;
             const c    = COLORS[i];
@@ -238,29 +309,18 @@ export default function Process() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
               >
-                <div className="relative shrink-0">
-                  <div
-                    className="absolute inset-0 rounded-full blur-md"
-                    style={{ backgroundColor: c.glow }}
-                  />
-                  <div
-                    className="relative w-12 h-12 rounded-full flex items-center justify-center text-white font-black text-base"
-                    style={{
-                      background: `linear-gradient(135deg, ${c.accent}ee, ${c.accent}66)`,
-                      border: `2px solid ${c.border}`,
-                    }}
-                  >
-                    {step.step}
-                  </div>
+                <div
+                  className="relative shrink-0 w-12 h-12 rounded-full flex items-center justify-center text-white font-black text-base"
+                  style={{ background: `linear-gradient(135deg, ${c}cc, ${c}55)`, border: `1px solid ${c}55` }}
+                >
+                  {step.step}
                 </div>
                 <div className="pt-1">
                   <div className="flex items-center gap-2 mb-1.5">
-                    <Icon className="w-4 h-4 shrink-0" style={{ color: c.accent }} strokeWidth={1.8} />
-                    <h3 className="text-sm font-bold text-brand-dark dark:text-white">{step.title}</h3>
+                    <Icon className="w-4 h-4 shrink-0" style={{ color: c }} strokeWidth={1.8} />
+                    <h3 className="text-sm font-bold text-white">{step.title}</h3>
                   </div>
-                  <p className="text-xs text-brand-muted dark:text-white/50 leading-relaxed">
-                    {step.description}
-                  </p>
+                  <p className="text-xs text-white/45 leading-relaxed">{step.description}</p>
                 </div>
               </motion.div>
             );
