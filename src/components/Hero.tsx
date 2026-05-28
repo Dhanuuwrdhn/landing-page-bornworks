@@ -48,72 +48,36 @@ function Typewriter() {
   );
 }
 
-/* ── Crystal Glass Background ─────────────────────────── */
-// 8 overlapping parallelogram panels (skew S=70, width W=220).
-// Each has a vertical gradient: opaque colour at top → transparent at ~78% height.
-// Where panels overlap, opacity compounds — producing the darker triangular facets
-// visible in the reference image without needing explicit highlight polygons.
-// A white fade overlay on the bottom 40% cleans up the lower portion.
+/* ── Dark Gradient Background ─────────────────────────── */
 function GeometricBg() {
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      <div className="absolute inset-0 bg-white dark:bg-[#07090f]" />
+    <div className="absolute inset-0 overflow-x-hidden pointer-events-none">
+      {/* Deep dark navy base */}
+      <div className="absolute inset-0 bg-[#060b18]" />
 
-      <svg
-        className="absolute inset-0 w-full h-full dark:opacity-30"
-        viewBox="0 0 1440 900"
-        preserveAspectRatio="xMidYMid slice"
-        aria-hidden="true"
-      >
-        <defs>
-          {/* gradientUnits="userSpaceOnUse" — y coords are absolute SVG pixels */}
-          <linearGradient id="cp1" x1="0" y1="0" x2="0" y2="700" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.70" />
-            <stop offset="100%" stopColor="#FDE68A" stopOpacity="0" />
-          </linearGradient>
-          <linearGradient id="cp2" x1="0" y1="0" x2="0" y2="680" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#F97316" stopOpacity="0.60" />
-            <stop offset="100%" stopColor="#FED7AA" stopOpacity="0" />
-          </linearGradient>
-          <linearGradient id="cp3" x1="0" y1="0" x2="0" y2="710" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#EC4899" stopOpacity="0.55" />
-            <stop offset="100%" stopColor="#FBCFE8" stopOpacity="0" />
-          </linearGradient>
-          <linearGradient id="cp4" x1="0" y1="0" x2="0" y2="700" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#A855F7" stopOpacity="0.55" />
-            <stop offset="100%" stopColor="#EDE9FE" stopOpacity="0" />
-          </linearGradient>
-          <linearGradient id="cp5" x1="0" y1="0" x2="0" y2="690" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#7C3AED" stopOpacity="0.60" />
-            <stop offset="100%" stopColor="#DDD6FE" stopOpacity="0" />
-          </linearGradient>
-          <linearGradient id="cp6" x1="0" y1="0" x2="0" y2="720" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.65" />
-            <stop offset="100%" stopColor="#DBEAFE" stopOpacity="0" />
-          </linearGradient>
-          <linearGradient id="cp7" x1="0" y1="0" x2="0" y2="730" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#0EA5E9" stopOpacity="0.60" />
-            <stop offset="100%" stopColor="#E0F2FE" stopOpacity="0" />
-          </linearGradient>
-          <linearGradient id="cp8" x1="0" y1="0" x2="0" y2="740" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#38BDF8" stopOpacity="0.55" />
-            <stop offset="100%" stopColor="#F0F9FF" stopOpacity="0" />
-          </linearGradient>
-        </defs>
+      {/* Blue blob — slow drift left/up */}
+      <motion.div
+        className="absolute -top-[15%] -left-[10%] w-[75vw] h-[75vw] max-w-[980px] max-h-[980px] rounded-full bg-[#1e3a8a] opacity-[0.65] blur-[140px]"
+        animate={{ x: [0, 45, 0], y: [0, -30, 0], scale: [1, 1.07, 1] }}
+        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+      />
 
-        {/* Panels — formula: "(bx+70),0  (bx+290),0  (bx+220),900  bx,900"  */}
-        <polygon points="-20,0  200,0  130,900  -90,900"   fill="url(#cp1)" />
-        <polygon points="140,0  360,0  290,900   70,900"   fill="url(#cp2)" />
-        <polygon points="300,0  520,0  450,900  230,900"   fill="url(#cp3)" />
-        <polygon points="460,0  680,0  610,900  390,900"   fill="url(#cp4)" />
-        <polygon points="620,0  840,0  770,900  550,900"   fill="url(#cp5)" />
-        <polygon points="780,0 1000,0  930,900  710,900"   fill="url(#cp6)" />
-        <polygon points="940,0 1160,0 1090,900  870,900"   fill="url(#cp7)" />
-        <polygon points="1100,0 1440,0 1440,900 1030,900"  fill="url(#cp8)" />
-      </svg>
+      {/* Purple blob — slow drift right/down */}
+      <motion.div
+        className="absolute -top-[5%] right-[-15%] w-[65vw] h-[65vw] max-w-[860px] max-h-[860px] rounded-full bg-[#4c1d95] opacity-[0.55] blur-[130px]"
+        animate={{ x: [0, -40, 0], y: [0, 28, 0], scale: [1, 1.05, 1] }}
+        transition={{ duration: 24, repeat: Infinity, ease: "easeInOut", delay: 3 }}
+      />
 
-      {/* Fade bottom 40% to white so text area is clean */}
-      <div className="absolute bottom-0 inset-x-0 h-[45%] bg-gradient-to-t from-white dark:from-[#07090f] to-transparent" />
+      {/* Indigo centre — breathes gently */}
+      <motion.div
+        className="absolute top-[25%] left-[25%] w-[45vw] h-[45vw] max-w-[600px] max-h-[600px] rounded-full bg-[#3730a3] opacity-[0.40] blur-[110px]"
+        animate={{ x: [0, 20, -15, 0], y: [0, 25, -10, 0], scale: [1, 1.09, 0.96, 1] }}
+        transition={{ duration: 28, repeat: Infinity, ease: "easeInOut", delay: 6 }}
+      />
+
+      {/* Bottom fade so About card reads as separate */}
+      <div className="absolute bottom-0 inset-x-0 h-[28%] bg-gradient-to-t from-[#060b18] to-transparent" />
     </div>
   );
 }
@@ -139,7 +103,7 @@ export default function Hero() {
   const { lang } = useLang();
 
   return (
-    <section id="hero" className="relative overflow-hidden flex flex-col min-h-screen">
+    <section id="hero" className="relative overflow-x-hidden flex flex-col min-h-screen rounded-b-[2.5rem] z-10">
       <GeometricBg />
 
       {/* Content anchored to the bottom-left, matching the reference layout */}
@@ -157,7 +121,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, delay: 0.1 }}
-          className="text-5xl font-extrabold leading-[1.06] tracking-tight text-brand-dark dark:text-white sm:text-6xl lg:text-7xl xl:text-[5.25rem] max-w-3xl"
+          className="text-5xl font-extrabold leading-[1.06] tracking-tight text-white sm:text-6xl lg:text-7xl xl:text-[5.25rem] max-w-3xl"
         >
           {t.headline[lang]}
           <br />
@@ -171,11 +135,11 @@ export default function Hero() {
           className="mt-8 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between"
         >
           <div className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-5 max-w-2xl">
-            <p className="text-sm leading-relaxed text-brand-muted dark:text-white/50 max-w-[260px]">
+            <p className="text-sm leading-relaxed text-white/55 max-w-[260px]">
               {t.sub1[lang]}
             </p>
-            <ArrowRight className="w-4 h-4 mt-0.5 shrink-0 text-brand-dark/25 dark:text-white/20 hidden sm:block" />
-            <p className="text-sm leading-relaxed text-brand-muted dark:text-white/50 max-w-[180px]">
+            <ArrowRight className="w-4 h-4 mt-0.5 shrink-0 text-white/25 hidden sm:block" />
+            <p className="text-sm leading-relaxed text-white/55 max-w-[180px]">
               {t.sub2[lang]}
             </p>
           </div>
@@ -192,7 +156,7 @@ export default function Hero() {
             <a
               href="#portfolio"
               id="hero-cta-secondary"
-              className="inline-flex items-center gap-2 rounded-xl border border-brand-dark/15 dark:border-white/15 px-6 py-3 text-sm font-semibold text-brand-dark dark:text-white hover:bg-brand-dark/5 dark:hover:bg-white/5 transition-colors"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/20 px-6 py-3 text-sm font-semibold text-white hover:bg-white/8 transition-colors"
             >
               {t.cta2[lang]}
             </a>
@@ -200,7 +164,6 @@ export default function Hero() {
         </motion.div>
       </div>
 
-      <div className="relative h-px w-full bg-brand-dark/8 dark:bg-white/8" />
     </section>
   );
 }

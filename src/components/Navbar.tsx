@@ -25,13 +25,19 @@ const cta = { en: "Start a Project", id: "Mulai Project" };
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [onHero, setOnHero]   = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
   const { lang } = useLang();
   const links = navLinks[lang];
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
+    const handleScroll = () => {
+      const y = window.scrollY;
+      setScrolled(y > 20);
+      const hero = document.getElementById("hero");
+      setOnHero(y < (hero ? hero.offsetHeight - 80 : window.innerHeight - 80));
+    };
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -68,7 +74,7 @@ export default function Navbar() {
               <ArrowUp className="w-5 h-5 text-brand-amber" strokeWidth={2.5} />
             </div>
             <span className="text-xl font-bold tracking-tight">
-              <span className="text-brand-dark dark:text-white">born</span>
+              <span className={`transition-colors duration-300 ${onHero ? "text-white" : "text-brand-dark dark:text-white"}`}>born</span>
               <span className="text-brand-amber">works</span>
             </span>
           </a>
@@ -84,7 +90,9 @@ export default function Navbar() {
                   className={`relative px-4 py-2 text-sm font-medium transition-colors rounded-lg ${
                     isActive
                       ? "text-brand-amber"
-                      : "text-brand-dark/70 dark:text-white/60 hover:text-brand-dark dark:hover:text-white hover:bg-brand-amber/5"
+                      : onHero
+                        ? "text-white/75 hover:text-white hover:bg-white/8"
+                        : "text-brand-dark/70 dark:text-white/60 hover:text-brand-dark dark:hover:text-white hover:bg-brand-amber/5"
                   }`}
                 >
                   {link.label}
@@ -121,15 +129,15 @@ export default function Navbar() {
             >
               <motion.span
                 animate={mobileOpen ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
-                className="block h-0.5 w-6 bg-brand-dark dark:bg-white rounded-full origin-center"
+                className={`block h-0.5 w-6 rounded-full origin-center transition-colors duration-300 ${onHero ? "bg-white" : "bg-brand-dark dark:bg-white"}`}
               />
               <motion.span
                 animate={mobileOpen ? { opacity: 0 } : { opacity: 1 }}
-                className="block h-0.5 w-6 bg-brand-dark dark:bg-white rounded-full"
+                className={`block h-0.5 w-6 rounded-full transition-colors duration-300 ${onHero ? "bg-white" : "bg-brand-dark dark:bg-white"}`}
               />
               <motion.span
                 animate={mobileOpen ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
-                className="block h-0.5 w-6 bg-brand-dark dark:bg-white rounded-full origin-center"
+                className={`block h-0.5 w-6 rounded-full origin-center transition-colors duration-300 ${onHero ? "bg-white" : "bg-brand-dark dark:bg-white"}`}
               />
             </button>
           </div>

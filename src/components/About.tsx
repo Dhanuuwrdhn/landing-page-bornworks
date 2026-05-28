@@ -41,11 +41,11 @@ export default function About() {
   return (
     <section
       id="about"
-      className="relative py-24 md:py-32 bg-white dark:bg-[#0a0e1a] overflow-hidden"
+      className="relative py-24 md:py-32 bg-white dark:bg-[#0d1117] overflow-x-hidden z-10"
     >
-      {/* Subtle amber blob */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/2 right-0 -translate-y-1/2 w-[520px] h-[520px] bg-brand-amber/5 rounded-full blur-3xl" />
+        {/* Subtle amber blob — keeps brand colour present */}
+        <div className="absolute top-1/2 right-0 -translate-y-1/2 w-[520px] h-[520px] bg-brand-amber/[0.04] rounded-full blur-3xl" />
       </div>
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -86,7 +86,7 @@ export default function About() {
               return (
                 <motion.div
                   key={i}
-                  className="flex items-start gap-5 rounded-2xl p-5 border border-brand-dark/6 dark:border-white/6 bg-brand-light/60 dark:bg-white/[0.03] hover:border-brand-amber/40 hover:bg-brand-amber/[0.03] transition-colors duration-300"
+                  className="flex items-start gap-5 rounded-2xl p-5 border border-brand-dark/8 dark:border-white/6 bg-brand-light dark:bg-white/[0.03] hover:border-brand-amber/40 hover:bg-brand-amber/[0.03] transition-colors duration-300"
                   initial={{ opacity: 0, x: 24 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}

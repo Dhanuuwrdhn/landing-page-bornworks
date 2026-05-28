@@ -78,7 +78,7 @@ export default function Services() {
   return (
     <section
       id="services"
-      className="relative py-24 md:py-32 bg-[#fafafa] dark:bg-[#070911]"
+      className="relative py-24 md:py-32 bg-[#fafafa] dark:bg-[#070911] rounded-t-[2.5rem] shadow-[0_-8px_40px_rgba(0,0,0,0.06)] z-10"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
@@ -119,7 +119,7 @@ export default function Services() {
 
                 {/* Column 1 — number + icon */}
                 <div className="flex md:flex-col items-center md:items-start gap-4">
-                  <span className="text-5xl font-black leading-none select-none text-brand-dark/[0.07] dark:text-white/[0.07]">
+                  <span className="text-5xl font-black leading-none select-none text-brand-dark/[0.07] dark:text-white/[0.07] group-hover:text-brand-amber transition-colors duration-300">
                     {svc.num}
                   </span>
                   <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-amber/10 group-hover:bg-brand-amber/20 transition-colors duration-300">

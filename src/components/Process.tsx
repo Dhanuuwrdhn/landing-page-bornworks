@@ -33,7 +33,7 @@ const steps = {
 };
 
 /* ── Colours ──────────────────────────────────────────── */
-const COLORS = ["#F59E0B", "#EC4899", "#A855F7", "#3B82F6"];
+const COLORS = ["#3b82f6", "#6366f1", "#8b5cf6", "#a78bfa"];
 
 /*
   Straight full-viewport-width ribbon.
@@ -169,10 +169,10 @@ export default function Process() {
           >
             <defs>
               <linearGradient id="ribGrad" x1="0" y1="0" x2="1000" y2="0" gradientUnits="userSpaceOnUse">
-                <stop offset="0%"   stopColor="#F59E0B" />
-                <stop offset="33%"  stopColor="#EC4899" />
-                <stop offset="66%"  stopColor="#A855F7" />
-                <stop offset="100%" stopColor="#3B82F6" />
+                <stop offset="0%"   stopColor="#3b82f6" />
+                <stop offset="33%"  stopColor="#6366f1" />
+                <stop offset="66%"  stopColor="#8b5cf6" />
+                <stop offset="100%" stopColor="#a78bfa" />
               </linearGradient>
               {/* Very subtle glow — just enough to feel lit */}
               <filter id="lineGlow" x="0" y="-300%" width="100%" height="700%">
