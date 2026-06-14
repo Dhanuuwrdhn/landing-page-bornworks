@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import nodemailer from "nodemailer";
 
 type ContactPayload = {
   name?: unknown;
@@ -103,31 +102,8 @@ function buildEmailMarkup({
   };
 }
 
-function createTransporter() {
-  const smtpHost = process.env.SMTP_HOST || "smtp.gmail.com";
-  const smtpPort = Number(process.env.SMTP_PORT || "465");
-  const smtpSecure = process.env.SMTP_SECURE
-    ? process.env.SMTP_SECURE === "true"
-    : smtpPort === 465;
-  const smtpUser = process.env.SMTP_USER;
-  const smtpPass = process.env.SMTP_PASS;
-
-  if (!smtpUser || !smtpPass) {
-    return null;
-  }
-
-  return nodemailer.createTransport({
-    host: smtpHost,
-    port: smtpPort,
-    secure: smtpSecure,
-    auth: {
-      user: smtpUser,
-      pass: smtpPass,
-    },
-  });
-}
-
-async function sendViaSmtp({
+async function sendViaResend({
+  apiKey,
   to,
   from,
   subject,
@@ -135,6 +111,7 @@ async function sendViaSmtp({
   text,
   replyTo,
 }: {
+  apiKey: string;
   to: string[];
   from: string;
   subject: string;
@@ -142,20 +119,33 @@ async function sendViaSmtp({
   text: string;
   replyTo: string;
 }) {
-  const transporter = createTransporter();
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10_000);
 
-  if (!transporter) {
-    throw new Error("SMTP is not configured. Please set SMTP_USER and SMTP_PASS.");
+  let response: Response;
+  try {
+    response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ from, to, subject, html, text, reply_to: replyTo }),
+      signal: controller.signal,
+    });
+  } catch (error) {
+    if (error instanceof Error && error.name === "AbortError") {
+      throw new Error("Resend delivery timed out");
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeout);
   }
 
-  await transporter.sendMail({
-    from,
-    to: to.join(", "),
-    subject,
-    html,
-    text,
-    replyTo,
-  });
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Resend delivery failed: ${errorText}`);
+  }
 }
 
 async function sendViaWebhook({
@@ -241,22 +231,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: true });
     }
 
-    const contactToRecipients = parseRecipientList(
-      process.env.CONTACT_TO_EMAIL || "jasmine.adlina@gmail.com"
-    );
-    const contactFromEmail =
-      process.env.CONTACT_FROM_EMAIL || process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER;
-
-    if (!contactFromEmail) {
+    const resendApiKey = process.env.RESEND_API_KEY;
+    if (!resendApiKey) {
       return NextResponse.json(
         {
           ok: false,
           code: "delivery_unavailable",
-          message: "Email delivery is not configured. Please set SMTP credentials first.",
+          message: "Email delivery is not configured. Please set RESEND_API_KEY.",
         },
         { status: 503 }
       );
     }
+
+    const contactToRecipients = parseRecipientList(process.env.CONTACT_TO_EMAIL);
+    const contactFromEmail =
+      process.env.CONTACT_FROM_EMAIL || "bornworks <onboarding@resend.dev>";
 
     if (
       contactToRecipients.length === 0 ||
@@ -283,7 +272,8 @@ export async function POST(request: Request) {
       );
     }
 
-    await sendViaSmtp({
+    await sendViaResend({
+      apiKey: resendApiKey,
       to: contactToRecipients,
       from: contactFromEmail,
       subject: message.subject,
@@ -299,13 +289,9 @@ export async function POST(request: Request) {
     console.error("[contact-form] delivery failed", {
       message,
       hasWebhookUrl: Boolean(process.env.CONTACT_FORM_WEBHOOK_URL),
-      hasSmtpUser: Boolean(process.env.SMTP_USER),
-      hasSmtpPass: Boolean(process.env.SMTP_PASS),
-      smtpHost: process.env.SMTP_HOST || "smtp.gmail.com",
-      smtpPort: process.env.SMTP_PORT || "465",
-      contactFromEmail:
-        process.env.CONTACT_FROM_EMAIL ?? process.env.SMTP_FROM_EMAIL ?? process.env.SMTP_USER ?? null,
-      contactToEmail: process.env.CONTACT_TO_EMAIL ?? "jasmine.adlina@gmail.com",
+      hasResendApiKey: Boolean(process.env.RESEND_API_KEY),
+      contactFromEmail: process.env.CONTACT_FROM_EMAIL ?? "bornworks <onboarding@resend.dev>",
+      contactToEmail: process.env.CONTACT_TO_EMAIL ?? null,
     });
 
     return NextResponse.json(
