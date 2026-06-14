@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { MessageCircle, Mail } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
+import ContactModal from "./ContactModal";
 
 /* ── Config ───────────────────────────────────────────── */
-const WA_NUMBER = "6281234567890";
+const WA_NUMBER_FALLBACK = "6281234567890";
 const WA_MSG = {
   en: "Hi Born2Works! I'd like to discuss my project.",
   id: "Halo Born2Works! Saya ingin diskusi tentang project saya.",
@@ -29,9 +31,12 @@ const t = {
 };
 
 /* ── Component ────────────────────────────────────────── */
-export default function CTA() {
+export default function CTA({ whatsappNumber }: { whatsappNumber?: string }) {
   const { lang } = useLang();
-  const waUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(WA_MSG[lang])}`;
+  const [modalOpen, setModalOpen] = useState(false);
+  // wa.me wants digits only (country code + number, no +/spaces)
+  const waNumber = (whatsappNumber || WA_NUMBER_FALLBACK).replace(/\D/g, "");
+  const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(WA_MSG[lang])}`;
 
   return (
     <section id="contact" className="relative py-28 md:py-40 bg-[#060b18] overflow-hidden">
@@ -120,14 +125,15 @@ export default function CTA() {
             {t.waCta[lang]}
           </a>
 
-          {/* Secondary — Email */}
-          <a
-            href="mailto:hello@bornworks.id"
+          {/* Secondary — Email form modal */}
+          <button
+            type="button"
+            onClick={() => setModalOpen(true)}
             className="inline-flex items-center gap-2 rounded-2xl border border-white/15 px-6 py-4 text-sm font-semibold text-white/55 hover:border-white/30 hover:text-white/85 transition-colors duration-300"
           >
             <Mail className="w-4 h-4" />
             {t.email[lang]}
-          </a>
+          </button>
         </motion.div>
 
         {/* Trust note */}
@@ -142,6 +148,8 @@ export default function CTA() {
         </motion.p>
 
       </div>
+
+      <ContactModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </section>
   );
 }

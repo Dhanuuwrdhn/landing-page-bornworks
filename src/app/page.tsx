@@ -20,7 +20,7 @@ export default function Home() {
         <Services />
         <Process />
         <Portfolio />
-        <CTA />
+        <CTA whatsappNumber={process.env.WHATSAPP_NO} />
         <Footer />
       </main>
     </LanguageProvider>
