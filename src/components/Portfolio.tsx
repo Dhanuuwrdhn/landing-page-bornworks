@@ -97,13 +97,16 @@ export default function Portfolio() {
   // Keep a stable ref so ScrollTrigger never holds a stale closure
   useEffect(() => { goToRef.current = goTo; }, [goTo]);
 
-  /* ── GSAP ScrollTrigger: pins the section, drives the index ── */
+  /* ── GSAP ScrollTrigger: pins the section, drives the index ──
+     Only on desktop (md+). On mobile the projects render as a normal
+     vertical card list, so we must NOT pin / hijack the scroll. ── */
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
     const section = sectionRef.current;
     if (!section) return;
 
-    const ctx = gsap.context(() => {
+    const mm = gsap.matchMedia();
+    mm.add("(min-width: 768px)", () => {
       stRef.current = ScrollTrigger.create({
         trigger: section,
         start: "top top",
@@ -120,9 +123,10 @@ export default function Portfolio() {
           if (idx !== prevRef.current) goToRef.current(idx);
         },
       });
-    }, section);
+      return () => { stRef.current = null; };
+    });
 
-    return () => ctx.revert();
+    return () => mm.revert();
   }, [N]);
 
   /* ── Keyboard ── */
@@ -148,9 +152,84 @@ export default function Portfolio() {
       ref={sectionRef}
       id="portfolio"
       className="relative bg-white dark:bg-[#0a0e1a]"
-      style={{ minHeight: "100vh" }}
     >
-      <div className="flex" style={{ height: "100vh" }}>
+      {/* ══ MOBILE (< md): simple vertical card list, normal scroll ══ */}
+      <div className="md:hidden px-4 sm:px-6 py-20">
+        <div className="mb-8">
+          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-amber">
+            {t.label[lang]}
+          </span>
+        </div>
+
+        <div className="flex flex-col gap-8">
+          {list.map((p, i) => (
+            <motion.article
+              key={i}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.5 }}
+              className="overflow-hidden rounded-2xl border border-brand-dark/8 dark:border-white/8 bg-brand-light dark:bg-white/[0.03]"
+            >
+              {/* Image / decorative panel */}
+              <div className={`relative aspect-[16/10] bg-gradient-to-br ${p.bg} flex items-center justify-center`}>
+                {p.image ? (
+                  <div className="absolute inset-0 p-4">
+                    <div className="relative w-full h-full">
+                      <Image
+                        src={p.image}
+                        alt={p.title}
+                        fill
+                        sizes="100vw"
+                        className="object-contain drop-shadow-xl"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="relative">
+                    <div className={`w-28 h-28 rounded-2xl bg-gradient-to-br ${p.accent} shadow-xl shadow-black/20`} />
+                    <div className={`absolute -bottom-4 -right-4 w-16 h-16 rounded-xl bg-gradient-to-br ${p.accent} opacity-40`} />
+                  </div>
+                )}
+              </div>
+
+              {/* Text */}
+              <div className="p-5">
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {p.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="rounded-lg bg-brand-amber/10 px-2.5 py-1 text-[11px] font-semibold text-brand-amber-dark dark:text-brand-amber"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                <h3 className="text-xl font-extrabold leading-tight text-brand-dark dark:text-white">
+                  {p.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-brand-muted dark:text-white/50">
+                  {p.description}
+                </p>
+                {p.url && (
+                  <a
+                    href={p.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group mt-4 inline-flex items-center gap-2 text-sm font-semibold text-brand-amber"
+                  >
+                    {t.view[lang]}
+                    <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                  </a>
+                )}
+              </div>
+            </motion.article>
+          ))}
+        </div>
+      </div>
+
+      {/* ══ DESKTOP (md+): pinned film-slider ══ */}
+      <div className="hidden md:flex" style={{ height: "100vh" }}>
 
         {/* ── LEFT: image panel — film-camera horizontal slide ── */}
         <div className="relative w-[55%] overflow-hidden">
