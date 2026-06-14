@@ -7,8 +7,6 @@ import Process from "@/components/Process";
 import Portfolio from "@/components/Portfolio";
 import CTA from "@/components/CTA";
 import Footer from "@/components/Footer";
-import FloatingWhatsApp from "@/components/FloatingWhatsApp";
-import FloatingControls from "@/components/FloatingControls";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 
 export default function Home() {
@@ -24,8 +22,6 @@ export default function Home() {
         <Portfolio />
         <CTA />
         <Footer />
-        <FloatingWhatsApp />
-        <FloatingControls />
       </main>
     </LanguageProvider>
   );

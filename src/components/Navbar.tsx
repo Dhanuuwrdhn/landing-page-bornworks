@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ArrowUp } from "lucide-react";
+import { ArrowUp, Languages } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import ThemeToggle from "./ThemeToggle";
 import { useLang } from "@/contexts/LanguageContext";
 
 const navLinks = {
@@ -28,8 +27,15 @@ export default function Navbar() {
   const [onHero, setOnHero]   = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
-  const { lang } = useLang();
+  const { lang, toggleLang } = useLang();
   const links = navLinks[lang];
+
+  const langButtonClass = (hero: boolean) =>
+    `flex items-center gap-1.5 rounded-xl px-3 h-9 text-xs font-bold uppercase transition-colors ${
+      hero
+        ? "text-white/80 hover:text-white hover:bg-white/10"
+        : "text-brand-dark/70 dark:text-white/70 hover:text-brand-dark dark:hover:text-white hover:bg-brand-amber/5"
+    }`;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -109,7 +115,15 @@ export default function Navbar() {
           </div>
 
           <div className="hidden md:flex items-center gap-3">
-            <ThemeToggle />
+            <button
+              onClick={toggleLang}
+              id="nav-language"
+              aria-label="Toggle language"
+              className={langButtonClass(onHero)}
+            >
+              <Languages className="w-3.5 h-3.5" />
+              {lang}
+            </button>
             <a
               href="#contact"
               id="nav-cta"
@@ -120,7 +134,15 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center gap-2 md:hidden">
-            <ThemeToggle />
+            <button
+              onClick={toggleLang}
+              id="nav-language-mobile"
+              aria-label="Toggle language"
+              className={langButtonClass(onHero)}
+            >
+              <Languages className="w-3.5 h-3.5" />
+              {lang}
+            </button>
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
               className="flex flex-col gap-1.5 p-2"

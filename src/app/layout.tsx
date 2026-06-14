@@ -69,11 +69,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" className={`${inter.variable} h-full antialiased scroll-smooth`}>
+    <html lang="id" className={`dark ${inter.variable} h-full antialiased scroll-smooth`}>
       <head>
         <JsonLd />
       </head>
-      <body className="min-h-full flex flex-col bg-white text-brand-dark font-sans">
+      <body className="min-h-full flex flex-col bg-[#0a0e1a] text-brand-light font-sans">
         {children}
       </body>
     </html>

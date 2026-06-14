@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import Image from "next/image";
 import { ExternalLink } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { gsap } from "gsap";
@@ -16,16 +17,18 @@ const t = {
 /* ── Data ─────────────────────────────────────────────── */
 const projects = {
   en: [
-    { title: "Financial Planning App",     description: "Personal finance management with budgeting, expense tracking, and investment portfolio insights. Built for Android.", tags: ["Android", "Flutter"],   accent: "from-amber-400 to-orange-500",   bg: "from-amber-100  to-orange-100  dark:from-amber-900/40  dark:to-orange-900/40"  },
-    { title: "Company Profile + CMS",      description: "SEO-optimised company website with headless CMS, blazing-fast page loads, and an intuitive admin dashboard.",        tags: ["Next.js", "TypeScript"], accent: "from-blue-400 to-indigo-500",    bg: "from-blue-100   to-indigo-100  dark:from-blue-900/40   dark:to-indigo-900/40"  },
-    { title: "Restaurant Ordering System", description: "QR-based ordering with real-time kitchen display, table management, and integrated payment gateway.",                tags: ["Vue.js", "Express"],     accent: "from-emerald-400 to-teal-500",  bg: "from-emerald-100 to-teal-100  dark:from-emerald-900/40 dark:to-teal-900/40"   },
-    { title: "SaaS Analytics Dashboard",   description: "Real-time analytics with role-based access, custom charts, and webhook integrations for a B2B SaaS startup.",       tags: ["React", "Node.js"],      accent: "from-violet-400 to-purple-500", bg: "from-violet-100 to-purple-100 dark:from-violet-900/40  dark:to-purple-900/40" },
+    { title: "SPEKTRA — Transmission Risk Monitoring", description: "Monitoring system for PLN's power transmission tower vulnerabilities — real-time risk mapping, field inspection, and a reporting dashboard.", tags: ["Next.js", "NestJS"],     accent: "from-sky-400 to-cyan-500",      bg: "from-sky-100    to-cyan-100   dark:from-sky-900/40    dark:to-cyan-900/40",   url: "https://spektra.biz.id/login", image: "/porto/spektra-login.png" },
+    { title: "Financial Planning App",     description: "Personal finance management with budgeting, expense tracking, and investment portfolio insights. Built for Android.", tags: ["Android", "Flutter"],   accent: "from-amber-400 to-orange-500",   bg: "from-amber-100  to-orange-100  dark:from-amber-900/40  dark:to-orange-900/40", url: "", image: "" },
+    { title: "Company Profile + CMS",      description: "SEO-optimised company website with headless CMS, blazing-fast page loads, and an intuitive admin dashboard.",        tags: ["Next.js", "TypeScript"], accent: "from-blue-400 to-indigo-500",    bg: "from-blue-100   to-indigo-100  dark:from-blue-900/40   dark:to-indigo-900/40", url: "", image: "" },
+    { title: "Restaurant Ordering System", description: "QR-based ordering with real-time kitchen display, table management, and integrated payment gateway.",                tags: ["Vue.js", "Express"],     accent: "from-emerald-400 to-teal-500",  bg: "from-emerald-100 to-teal-100  dark:from-emerald-900/40 dark:to-teal-900/40",  url: "", image: "" },
+    { title: "SaaS Analytics Dashboard",   description: "Real-time analytics with role-based access, custom charts, and webhook integrations for a B2B SaaS startup.",       tags: ["React", "Node.js"],      accent: "from-violet-400 to-purple-500", bg: "from-violet-100 to-purple-100 dark:from-violet-900/40  dark:to-purple-900/40", url: "", image: "" },
   ],
   id: [
-    { title: "Aplikasi Perencanaan Keuangan", description: "Manajemen keuangan pribadi dengan budgeting, pelacakan pengeluaran, dan insight portofolio investasi.",           tags: ["Android", "Flutter"],   accent: "from-amber-400 to-orange-500",   bg: "from-amber-100  to-orange-100  dark:from-amber-900/40  dark:to-orange-900/40"  },
-    { title: "Company Profile + CMS",         description: "Website company profile dengan headless CMS, loading super cepat, dan dashboard admin intuitif.",                tags: ["Next.js", "TypeScript"], accent: "from-blue-400 to-indigo-500",    bg: "from-blue-100   to-indigo-100  dark:from-blue-900/40   dark:to-indigo-900/40"  },
-    { title: "Sistem Pemesanan Restoran",      description: "Pemesanan berbasis QR dengan tampilan dapur real-time, manajemen meja, dan pembayaran terintegrasi.",            tags: ["Vue.js", "Express"],     accent: "from-emerald-400 to-teal-500",  bg: "from-emerald-100 to-teal-100  dark:from-emerald-900/40 dark:to-teal-900/40"   },
-    { title: "Dashboard Analitik SaaS",       description: "Analitik real-time dengan akses berbasis peran, grafik kustom, dan integrasi webhook untuk startup B2B.",        tags: ["React", "Node.js"],      accent: "from-violet-400 to-purple-500", bg: "from-violet-100 to-purple-100 dark:from-violet-900/40  dark:to-purple-900/40" },
+    { title: "SPEKTRA — Pemantauan Kerawanan Transmisi", description: "Sistem pemantauan kerawanan tower transmisi listrik PLN — pemetaan risiko real-time, inspeksi lapangan, dan dashboard pelaporan.", tags: ["Next.js", "NestJS"],     accent: "from-sky-400 to-cyan-500",      bg: "from-sky-100    to-cyan-100   dark:from-sky-900/40    dark:to-cyan-900/40",   url: "https://spektra.biz.id/login", image: "/porto/spektra-login.png" },
+    { title: "Aplikasi Perencanaan Keuangan", description: "Manajemen keuangan pribadi dengan budgeting, pelacakan pengeluaran, dan insight portofolio investasi.",           tags: ["Android", "Flutter"],   accent: "from-amber-400 to-orange-500",   bg: "from-amber-100  to-orange-100  dark:from-amber-900/40  dark:to-orange-900/40", url: "", image: "" },
+    { title: "Company Profile + CMS",         description: "Website company profile dengan headless CMS, loading super cepat, dan dashboard admin intuitif.",                tags: ["Next.js", "TypeScript"], accent: "from-blue-400 to-indigo-500",    bg: "from-blue-100   to-indigo-100  dark:from-blue-900/40   dark:to-indigo-900/40", url: "", image: "" },
+    { title: "Sistem Pemesanan Restoran",      description: "Pemesanan berbasis QR dengan tampilan dapur real-time, manajemen meja, dan pembayaran terintegrasi.",            tags: ["Vue.js", "Express"],     accent: "from-emerald-400 to-teal-500",  bg: "from-emerald-100 to-teal-100  dark:from-emerald-900/40 dark:to-teal-900/40",  url: "", image: "" },
+    { title: "Dashboard Analitik SaaS",       description: "Analitik real-time dengan akses berbasis peran, grafik kustom, dan integrasi webhook untuk startup B2B.",        tags: ["React", "Node.js"],      accent: "from-violet-400 to-purple-500", bg: "from-violet-100 to-purple-100 dark:from-violet-900/40  dark:to-purple-900/40", url: "", image: "" },
   ],
 };
 
@@ -162,20 +165,34 @@ export default function Portfolio() {
               transition={{ duration: 0.75, ease: [0.76, 0, 0.24, 1] }}
               className={`absolute inset-0 bg-gradient-to-br ${project.bg} flex items-center justify-center`}
             >
-              {/* Faint number watermark */}
-              <span
-                className="absolute bottom-10 right-10 font-black leading-none pointer-events-none select-none"
-                style={{ fontSize: "clamp(100px,14vw,200px)", color: "rgba(0,0,0,0.04)" }}
-              >
-                {String(activeIndex + 1).padStart(2, "0")}
-              </span>
+              {project.image ? (
+                /* Project screenshot */
+                <Image
+                  src={project.image}
+                  alt={project.title}
+                  fill
+                  priority={activeIndex === 0}
+                  sizes="55vw"
+                  className="object-cover"
+                />
+              ) : (
+                <>
+                  {/* Faint number watermark */}
+                  <span
+                    className="absolute bottom-10 right-10 font-black leading-none pointer-events-none select-none"
+                    style={{ fontSize: "clamp(100px,14vw,200px)", color: "rgba(0,0,0,0.04)" }}
+                  >
+                    {String(activeIndex + 1).padStart(2, "0")}
+                  </span>
 
-              {/* Decorative accent shapes */}
-              <div className="relative">
-                <div className={`w-52 h-52 rounded-[2rem] bg-gradient-to-br ${project.accent} shadow-2xl shadow-black/20`} />
-                <div className={`absolute -bottom-6 -right-6 w-32 h-32 rounded-2xl bg-gradient-to-br ${project.accent} opacity-40`} />
-                <div className={`absolute -top-6  -left-6  w-20 h-20 rounded-xl   bg-gradient-to-br ${project.accent} opacity-25`} />
-              </div>
+                  {/* Decorative accent shapes */}
+                  <div className="relative">
+                    <div className={`w-52 h-52 rounded-[2rem] bg-gradient-to-br ${project.accent} shadow-2xl shadow-black/20`} />
+                    <div className={`absolute -bottom-6 -right-6 w-32 h-32 rounded-2xl bg-gradient-to-br ${project.accent} opacity-40`} />
+                    <div className={`absolute -top-6  -left-6  w-20 h-20 rounded-xl   bg-gradient-to-br ${project.accent} opacity-25`} />
+                  </div>
+                </>
+              )}
             </motion.div>
           </AnimatePresence>
         </div>
@@ -239,10 +256,22 @@ export default function Portfolio() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.48, duration: 0.4, ease: "easeOut" }}
               >
-                <button className="group inline-flex items-center gap-2 text-sm font-semibold text-brand-amber hover:text-brand-amber-dark transition-colors">
-                  {t.view[lang]}
-                  <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                </button>
+                {project.url ? (
+                  <a
+                    href={project.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group inline-flex items-center gap-2 text-sm font-semibold text-brand-amber hover:text-brand-amber-dark transition-colors"
+                  >
+                    {t.view[lang]}
+                    <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                  </a>
+                ) : (
+                  <button className="group inline-flex items-center gap-2 text-sm font-semibold text-brand-amber hover:text-brand-amber-dark transition-colors">
+                    {t.view[lang]}
+                    <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                  </button>
+                )}
               </motion.div>
             </motion.div>
           </AnimatePresence>
