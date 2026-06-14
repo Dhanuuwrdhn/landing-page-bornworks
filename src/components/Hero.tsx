@@ -21,9 +21,10 @@ function Typewriter() {
   useEffect(() => {
     const current = words[wordIndex];
     const speed = deleting ? 50 : 100;
+    let pauseTimer: ReturnType<typeof setTimeout>;
     const timer = setTimeout(() => {
       if (!deleting && charIndex === current.length) {
-        setTimeout(() => setDeleting(true), 2000);
+        pauseTimer = setTimeout(() => setDeleting(true), 2000);
         return;
       }
       if (deleting && charIndex === 0) {
@@ -33,7 +34,10 @@ function Typewriter() {
       }
       setCharIndex((prev) => prev + (deleting ? -1 : 1));
     }, speed);
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(pauseTimer);
+    };
   }, [charIndex, deleting, wordIndex, words]);
 
   return (

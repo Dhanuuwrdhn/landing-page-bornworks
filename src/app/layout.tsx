@@ -69,7 +69,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" className={`dark ${inter.variable} h-full antialiased scroll-smooth`}>
+    <html lang="en" className={`dark ${inter.variable} h-full antialiased scroll-smooth`}>
       <head>
         <JsonLd />
       </head>

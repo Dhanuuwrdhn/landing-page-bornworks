@@ -166,15 +166,19 @@ export default function Portfolio() {
               className={`absolute inset-0 bg-gradient-to-br ${project.bg} flex items-center justify-center`}
             >
               {project.image ? (
-                /* Project screenshot */
-                <Image
-                  src={project.image}
-                  alt={project.title}
-                  fill
-                  priority={activeIndex === 0}
-                  sizes="55vw"
-                  className="object-cover"
-                />
+                /* Project screenshot — shown in full (no crop) on the gradient */
+                <div className="absolute inset-0 flex items-center justify-center p-8 sm:p-12 lg:p-16">
+                  <div className="relative w-full h-full">
+                    <Image
+                      src={project.image}
+                      alt={project.title}
+                      fill
+                      priority={activeIndex === 0}
+                      sizes="55vw"
+                      className="object-contain drop-shadow-2xl"
+                    />
+                  </div>
+                </div>
               ) : (
                 <>
                   {/* Faint number watermark */}

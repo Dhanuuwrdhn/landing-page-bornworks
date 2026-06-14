@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, ReactNode, useContext, useSyncExternalStore } from "react";
+import { createContext, ReactNode, useContext, useEffect, useSyncExternalStore } from "react";
 
 type Lang = "en" | "id";
 
@@ -31,6 +31,11 @@ function getLanguageSnapshot(): Lang {
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const lang = useSyncExternalStore<Lang>(subscribe, getLanguageSnapshot, () => "en");
+
+  // Keep <html lang> in sync with the active language (a11y + SEO)
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
 
   const toggleLang = () => {
     const next = lang === "en" ? "id" : "en";
