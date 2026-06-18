@@ -31,6 +31,15 @@ body {
 
 html {
   scroll-behavior: smooth;
+  /* Offset anchor jumps so section headings clear the fixed navbar
+     (h-16 = 4rem on mobile, h-20 = 5rem on md+). */
+  scroll-padding-top: 4.5rem;
+}
+
+@media (min-width: 768px) {
+  html {
+    scroll-padding-top: 5.5rem;
+  }
 }
 
 /* ===== GLASS UTILITIES — LIGHT ===== */
