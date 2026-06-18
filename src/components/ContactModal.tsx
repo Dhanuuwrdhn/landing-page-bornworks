@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import { X, Send, CheckCircle2, Loader2, AlertCircle } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
 
@@ -106,7 +106,7 @@ export default function ContactModal({
   return (
     <AnimatePresence>
       {open && (
-        <motion.div
+        <m.div
           className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -121,7 +121,7 @@ export default function ContactModal({
           />
 
           {/* Panel */}
-          <motion.div
+          <m.div
             role="dialog"
             aria-modal="true"
             aria-label={t.title[lang]}
@@ -258,8 +258,8 @@ export default function ContactModal({
                 </form>
               )}
             </div>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

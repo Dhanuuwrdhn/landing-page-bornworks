@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import JsonLd from "@/components/JsonLd";
+import MotionProvider from "@/components/MotionProvider";
 import { SITE_URL } from "@/lib/constants";
 
 const inter = Inter({
@@ -74,7 +75,7 @@ export default function RootLayout({
         <JsonLd />
       </head>
       <body className="min-h-full flex flex-col bg-[#0a0e1a] text-brand-light font-sans">
-        {children}
+        <MotionProvider>{children}</MotionProvider>
       </body>
     </html>
   );

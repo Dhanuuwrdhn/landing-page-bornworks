@@ -1,7 +1,7 @@
 "use client";
 
 import { Monitor, Smartphone, Layers, CheckCircle2 } from "lucide-react";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { useLang } from "@/contexts/LanguageContext";
 
 /* ── Translations ─────────────────────────────────────── */
@@ -83,7 +83,7 @@ export default function Services() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
         {/* Header — left-aligned */}
-        <motion.div
+        <m.div
           className="mb-14"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -99,14 +99,14 @@ export default function Services() {
           <p className="mt-3 text-brand-muted dark:text-white/50 max-w-lg">
             {t.sub[lang]}
           </p>
-        </motion.div>
+        </m.div>
 
         {/* Service rows */}
         <div className="border-t border-brand-dark/8 dark:border-white/8">
           {list.map((svc, i) => {
             const Icon = svc.icon;
             return (
-              <motion.div
+              <m.div
                 key={i}
                 className="group relative grid grid-cols-1 md:grid-cols-[88px_1fr_220px] gap-6 md:gap-10 border-b border-brand-dark/8 dark:border-white/8 py-10 md:py-12"
                 initial={{ opacity: 0, y: 20 }}
@@ -152,7 +152,7 @@ export default function Services() {
                     </li>
                   ))}
                 </ul>
-              </motion.div>
+              </m.div>
             );
           })}
         </div>

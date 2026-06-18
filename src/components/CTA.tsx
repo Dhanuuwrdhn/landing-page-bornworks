@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { MessageCircle, Mail } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
 import ContactModal from "./ContactModal";
@@ -43,17 +43,17 @@ export default function CTA({ whatsappNumber }: { whatsappNumber?: string }) {
 
       {/* Background — mirrors Hero gradient */}
       <div className="absolute inset-0 pointer-events-none">
-        <motion.div
+        <m.div
           className="absolute -top-[30%] -left-[15%] w-[70vw] h-[70vw] max-w-[900px] max-h-[900px] rounded-full bg-[#1e3a8a] opacity-[0.50] blur-[140px]"
           animate={{ x: [0, 35, 0], y: [0, -20, 0], scale: [1, 1.06, 1] }}
           transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
         />
-        <motion.div
+        <m.div
           className="absolute -top-[20%] right-[-20%] w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] rounded-full bg-[#4c1d95] opacity-[0.45] blur-[130px]"
           animate={{ x: [0, -30, 0], y: [0, 22, 0], scale: [1, 1.05, 1] }}
           transition={{ duration: 26, repeat: Infinity, ease: "easeInOut", delay: 4 }}
         />
-        <motion.div
+        <m.div
           className="absolute bottom-[-10%] left-[25%] w-[40vw] h-[40vw] max-w-[560px] max-h-[560px] rounded-full bg-[#3730a3] opacity-[0.30] blur-[110px]"
           animate={{ x: [0, 18, -12, 0], y: [0, 20, -8, 0] }}
           transition={{ duration: 30, repeat: Infinity, ease: "easeInOut", delay: 8 }}
@@ -64,7 +64,7 @@ export default function CTA({ whatsappNumber }: { whatsappNumber?: string }) {
       <div className="relative mx-auto max-w-3xl px-4 sm:px-6 text-center">
 
         {/* Badge */}
-        <motion.div
+        <m.div
           className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-4 py-1.5 mb-8"
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -75,10 +75,10 @@ export default function CTA({ whatsappNumber }: { whatsappNumber?: string }) {
           <span className="text-xs font-semibold uppercase tracking-[0.18em] text-white/55">
             {t.badge[lang]}
           </span>
-        </motion.div>
+        </m.div>
 
         {/* Headline */}
-        <motion.h2
+        <m.h2
           className="text-5xl font-extrabold leading-[1.05] tracking-tight text-white sm:text-6xl lg:text-[5rem]"
           initial={{ opacity: 0, y: 28 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -88,10 +88,10 @@ export default function CTA({ whatsappNumber }: { whatsappNumber?: string }) {
           {t.line1[lang]}
           <br />
           <span className="text-brand-amber">{t.line2[lang]}</span>
-        </motion.h2>
+        </m.h2>
 
         {/* Sub */}
-        <motion.p
+        <m.p
           className="mt-6 text-lg leading-relaxed text-white/45 max-w-xl mx-auto"
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -99,10 +99,10 @@ export default function CTA({ whatsappNumber }: { whatsappNumber?: string }) {
           transition={{ duration: 0.5, delay: 0.18 }}
         >
           {t.sub[lang]}
-        </motion.p>
+        </m.p>
 
         {/* Buttons */}
-        <motion.div
+        <m.div
           className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -116,7 +116,7 @@ export default function CTA({ whatsappNumber }: { whatsappNumber?: string }) {
             rel="noopener noreferrer"
             className="group relative inline-flex items-center gap-3 rounded-2xl bg-[#25D366] px-8 py-4 text-base font-bold text-white shadow-lg shadow-[#25D366]/20 hover:bg-[#1fba57] hover:shadow-[#25D366]/35 transition-all duration-300"
           >
-            <motion.span
+            <m.span
               className="absolute inset-0 rounded-2xl ring-2 ring-[#25D366]/30"
               animate={{ scale: [1, 1.06, 1], opacity: [0.6, 0, 0.6] }}
               transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
@@ -134,10 +134,10 @@ export default function CTA({ whatsappNumber }: { whatsappNumber?: string }) {
             <Mail className="w-4 h-4" />
             {t.email[lang]}
           </button>
-        </motion.div>
+        </m.div>
 
         {/* Trust note */}
-        <motion.p
+        <m.p
           className="mt-6 text-xs text-white/22"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -145,7 +145,7 @@ export default function CTA({ whatsappNumber }: { whatsappNumber?: string }) {
           transition={{ duration: 0.5, delay: 0.36 }}
         >
           {t.note[lang]}
-        </motion.p>
+        </m.p>
 
       </div>
 

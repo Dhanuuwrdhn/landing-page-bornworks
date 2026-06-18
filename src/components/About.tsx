@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { Zap, Shield, Eye } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
 
@@ -52,7 +52,7 @@ export default function About() {
         <div className="grid gap-16 lg:grid-cols-2 lg:gap-24 items-center">
 
           {/* Left — headline + description */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, x: -24 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
@@ -77,14 +77,14 @@ export default function About() {
                 {t.badge[lang]}
               </span>
             </div>
-          </motion.div>
+          </m.div>
 
           {/* Right — three value pillars */}
           <div className="flex flex-col gap-4">
             {values.map((v, i) => {
               const Icon = v.icon;
               return (
-                <motion.div
+                <m.div
                   key={i}
                   className="flex items-start gap-5 rounded-2xl p-5 border border-brand-dark/8 dark:border-white/6 bg-brand-light dark:bg-white/[0.03] hover:border-brand-amber/40 hover:bg-brand-amber/[0.03] transition-colors duration-300"
                   initial={{ opacity: 0, x: 24 }}
@@ -103,7 +103,7 @@ export default function About() {
                       {v.desc}
                     </p>
                   </div>
-                </motion.div>
+                </m.div>
               );
             })}
           </div>

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import Image from "next/image";
 import { ExternalLink } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useLang } from "@/contexts/LanguageContext";
@@ -17,14 +17,14 @@ const t = {
 /* ── Data ─────────────────────────────────────────────── */
 const projects = {
   en: [
-    { title: "SPEKTRA — Transmission Risk Monitoring", description: "Monitoring system for PLN's power transmission tower vulnerabilities — real-time risk mapping, field inspection, and a reporting dashboard.", tags: ["Next.js", "NestJS"],     accent: "from-sky-400 to-cyan-500",      bg: "from-sky-100    to-cyan-100   dark:from-sky-900/40    dark:to-cyan-900/40",   url: "https://spektra.biz.id/login", image: "/porto/spektra-login.png" },
+    { title: "SPEKTRA — Transmission Risk Monitoring", description: "Monitoring system for PLN's power transmission tower vulnerabilities — real-time risk mapping, field inspection, and a reporting dashboard.", tags: ["Next.js", "NestJS"],     accent: "from-sky-400 to-cyan-500",      bg: "from-sky-100    to-cyan-100   dark:from-sky-900/40    dark:to-cyan-900/40",   url: "https://spektra.biz.id/login", image: "/porto/spektra-login.webp" },
     { title: "Financial Planning App",     description: "Personal finance management with budgeting, expense tracking, and investment portfolio insights. Built for Android.", tags: ["Android", "Flutter"],   accent: "from-amber-400 to-orange-500",   bg: "from-amber-100  to-orange-100  dark:from-amber-900/40  dark:to-orange-900/40", url: "", image: "" },
     { title: "Company Profile + CMS",      description: "SEO-optimised company website with headless CMS, blazing-fast page loads, and an intuitive admin dashboard.",        tags: ["Next.js", "TypeScript"], accent: "from-blue-400 to-indigo-500",    bg: "from-blue-100   to-indigo-100  dark:from-blue-900/40   dark:to-indigo-900/40", url: "", image: "" },
     { title: "Restaurant Ordering System", description: "QR-based ordering with real-time kitchen display, table management, and integrated payment gateway.",                tags: ["Vue.js", "Express"],     accent: "from-emerald-400 to-teal-500",  bg: "from-emerald-100 to-teal-100  dark:from-emerald-900/40 dark:to-teal-900/40",  url: "", image: "" },
     { title: "SaaS Analytics Dashboard",   description: "Real-time analytics with role-based access, custom charts, and webhook integrations for a B2B SaaS startup.",       tags: ["React", "Node.js"],      accent: "from-violet-400 to-purple-500", bg: "from-violet-100 to-purple-100 dark:from-violet-900/40  dark:to-purple-900/40", url: "", image: "" },
   ],
   id: [
-    { title: "SPEKTRA — Pemantauan Kerawanan Transmisi", description: "Sistem pemantauan kerawanan tower transmisi listrik PLN — pemetaan risiko real-time, inspeksi lapangan, dan dashboard pelaporan.", tags: ["Next.js", "NestJS"],     accent: "from-sky-400 to-cyan-500",      bg: "from-sky-100    to-cyan-100   dark:from-sky-900/40    dark:to-cyan-900/40",   url: "https://spektra.biz.id/login", image: "/porto/spektra-login.png" },
+    { title: "SPEKTRA — Pemantauan Kerawanan Transmisi", description: "Sistem pemantauan kerawanan tower transmisi listrik PLN — pemetaan risiko real-time, inspeksi lapangan, dan dashboard pelaporan.", tags: ["Next.js", "NestJS"],     accent: "from-sky-400 to-cyan-500",      bg: "from-sky-100    to-cyan-100   dark:from-sky-900/40    dark:to-cyan-900/40",   url: "https://spektra.biz.id/login", image: "/porto/spektra-login.webp" },
     { title: "Aplikasi Perencanaan Keuangan", description: "Manajemen keuangan pribadi dengan budgeting, pelacakan pengeluaran, dan insight portofolio investasi.",           tags: ["Android", "Flutter"],   accent: "from-amber-400 to-orange-500",   bg: "from-amber-100  to-orange-100  dark:from-amber-900/40  dark:to-orange-900/40", url: "", image: "" },
     { title: "Company Profile + CMS",         description: "Website company profile dengan headless CMS, loading super cepat, dan dashboard admin intuitif.",                tags: ["Next.js", "TypeScript"], accent: "from-blue-400 to-indigo-500",    bg: "from-blue-100   to-indigo-100  dark:from-blue-900/40   dark:to-indigo-900/40", url: "", image: "" },
     { title: "Sistem Pemesanan Restoran",      description: "Pemesanan berbasis QR dengan tampilan dapur real-time, manajemen meja, dan pembayaran terintegrasi.",            tags: ["Vue.js", "Express"],     accent: "from-emerald-400 to-teal-500",  bg: "from-emerald-100 to-teal-100  dark:from-emerald-900/40 dark:to-teal-900/40",  url: "", image: "" },
@@ -55,7 +55,7 @@ function SlipWords({ text, baseDelay = 0 }: { text: string; baseDelay?: number }
           key={i}
           style={{ display: "inline-block", overflow: "hidden", lineHeight: 1.15 }}
         >
-          <motion.span
+          <m.span
             style={{ display: "inline-block" }}
             initial={{ y: "118%", rotate: 3 }}
             animate={{ y: "0%",   rotate: 0 }}
@@ -66,7 +66,7 @@ function SlipWords({ text, baseDelay = 0 }: { text: string; baseDelay?: number }
             }}
           >
             {word}&nbsp;
-          </motion.span>
+          </m.span>
         </span>
       ))}
     </>
@@ -163,7 +163,7 @@ export default function Portfolio() {
 
         <div className="flex flex-col gap-8">
           {list.map((p, i) => (
-            <motion.article
+            <m.article
               key={i}
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -223,7 +223,7 @@ export default function Portfolio() {
                   </a>
                 )}
               </div>
-            </motion.article>
+            </m.article>
           ))}
         </div>
       </div>
@@ -234,7 +234,7 @@ export default function Portfolio() {
         {/* ── LEFT: image panel — film-camera horizontal slide ── */}
         <div className="relative w-[55%] overflow-hidden">
           <AnimatePresence mode="sync" custom={direction}>
-            <motion.div
+            <m.div
               key={activeIndex}
               custom={direction}
               variants={filmVariants}
@@ -276,7 +276,7 @@ export default function Portfolio() {
                   </div>
                 </>
               )}
-            </motion.div>
+            </m.div>
           </AnimatePresence>
         </div>
 
@@ -295,7 +295,7 @@ export default function Portfolio() {
               - Title words: individual light-year slip on enter
               - Description + CTA: staggered fade after title lands            */}
           <AnimatePresence mode="sync">
-            <motion.div
+            <m.div
               key={activeIndex}
               className="absolute inset-0 flex flex-col justify-center px-14 gap-5"
               initial={{ y: "6%",  opacity: 0 }}
@@ -306,7 +306,7 @@ export default function Portfolio() {
               {/* Tags */}
               <div className="flex flex-wrap gap-2">
                 {project.tags.map((tag, i) => (
-                  <motion.span
+                  <m.span
                     key={tag}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -314,7 +314,7 @@ export default function Portfolio() {
                     className="rounded-lg bg-brand-amber/10 px-3 py-1 text-xs font-semibold text-brand-amber-dark dark:text-brand-amber"
                   >
                     {tag}
-                  </motion.span>
+                  </m.span>
                 ))}
               </div>
 
@@ -324,17 +324,17 @@ export default function Portfolio() {
               </h2>
 
               {/* Description — slides in as a single block after title settles */}
-              <motion.p
+              <m.p
                 className="text-base leading-relaxed text-brand-muted dark:text-white/50 max-w-sm"
                 initial={{ y: 22, opacity: 0 }}
                 animate={{ y: 0,  opacity: 1 }}
                 transition={{ delay: 0.32, duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
               >
                 {project.description}
-              </motion.p>
+              </m.p>
 
               {/* CTA */}
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.48, duration: 0.4, ease: "easeOut" }}
@@ -355,8 +355,8 @@ export default function Portfolio() {
                     <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                   </button>
                 )}
-              </motion.div>
-            </motion.div>
+              </m.div>
+            </m.div>
           </AnimatePresence>
 
           {/* Static footer: dot indicators + counter */}

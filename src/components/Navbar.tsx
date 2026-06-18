@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { ArrowUp, Languages } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import { useLang } from "@/contexts/LanguageContext";
 
 const navLinks = {
@@ -103,7 +103,7 @@ export default function Navbar() {
                 >
                   {link.label}
                   {isActive && (
-                    <motion.span
+                    <m.span
                       layoutId="nav-active"
                       className="absolute inset-x-2 -bottom-0.5 h-0.5 bg-brand-amber rounded-full"
                       transition={{ type: "spring", stiffness: 380, damping: 30 }}
@@ -149,15 +149,15 @@ export default function Navbar() {
               id="mobile-menu-toggle"
               aria-label="Toggle menu"
             >
-              <motion.span
+              <m.span
                 animate={mobileOpen ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
                 className={`block h-0.5 w-6 rounded-full origin-center transition-colors duration-300 ${onHero ? "bg-white" : "bg-brand-dark dark:bg-white"}`}
               />
-              <motion.span
+              <m.span
                 animate={mobileOpen ? { opacity: 0 } : { opacity: 1 }}
                 className={`block h-0.5 w-6 rounded-full transition-colors duration-300 ${onHero ? "bg-white" : "bg-brand-dark dark:bg-white"}`}
               />
-              <motion.span
+              <m.span
                 animate={mobileOpen ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
                 className={`block h-0.5 w-6 rounded-full origin-center transition-colors duration-300 ${onHero ? "bg-white" : "bg-brand-dark dark:bg-white"}`}
               />
@@ -168,7 +168,7 @@ export default function Navbar() {
 
       <AnimatePresence>
         {mobileOpen && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
@@ -197,7 +197,7 @@ export default function Navbar() {
                 {cta[lang]}
               </a>
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </nav>

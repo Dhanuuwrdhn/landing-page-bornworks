@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { Search, Pen, Code2, Rocket } from "lucide-react";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { gsap } from "gsap";
 import { useLang } from "@/contexts/LanguageContext";
 
@@ -128,7 +128,7 @@ export default function Process() {
       <div className="flex flex-col items-center gap-16 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
 
         {/* ── Header ── */}
-        <motion.div
+        <m.div
           className="text-center max-w-2xl"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -142,7 +142,7 @@ export default function Process() {
             {t.heading[lang]}
           </h2>
           <p className="mt-4 text-white/45 text-lg">{t.sub[lang]}</p>
-        </motion.div>
+        </m.div>
 
         {/* ── Desktop: ribbon + cards ── */}
         <div className="relative hidden md:block w-full" style={{ height: 300 }}>
@@ -214,7 +214,7 @@ export default function Process() {
               const isCurr = i === activeIndex;
 
               return (
-                <motion.div
+                <m.div
                   key={i}
                   className="flex flex-col items-center justify-center rounded-3xl p-6 text-center h-[230px]"
                   animate={{
@@ -273,7 +273,7 @@ export default function Process() {
                   >
                     {step.description}
                   </p>
-                </motion.div>
+                </m.div>
               );
             })}
           </div>
@@ -301,7 +301,7 @@ export default function Process() {
             const Icon = step.icon;
             const c    = COLORS[i];
             return (
-              <motion.div
+              <m.div
                 key={i}
                 className="flex items-start gap-4"
                 initial={{ opacity: 0, x: -20 }}
@@ -322,7 +322,7 @@ export default function Process() {
                   </div>
                   <p className="text-xs text-white/45 leading-relaxed">{step.description}</p>
                 </div>
-              </motion.div>
+              </m.div>
             );
           })}
         </div>
