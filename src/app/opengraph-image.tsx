@@ -1,148 +1,162 @@
+import { readFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 import { ImageResponse } from "next/og";
 
-export const alt = "bornworks — Software House Indonesia";
+export const alt = "bornworks — where products are born";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default function OgImage() {
+const font = (path: string) =>
+  readFile(fileURLToPath(new URL(path, import.meta.url)));
+
+export default async function OgImage() {
+  const [bold, medium] = await Promise.all([
+    font("./_og/SpaceGrotesk-700.ttf"),
+    font("./_og/SpaceGrotesk-500.ttf"),
+  ]);
+
+  const AMBER = "#F59E0B";
+  const INK = "#F7F8FB";
+  const MUTED = "#8A93A6";
+  const HAIRLINE = "#1E2740";
+
   return new ImageResponse(
     (
       <div
         style={{
           width: "1200px",
           height: "630px",
-          background: "linear-gradient(135deg, #0a0e1a 0%, #15192e 50%, #1e1535 100%)",
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          fontFamily: "sans-serif",
+          justifyContent: "space-between",
+          padding: "68px 72px",
+          background: "#070A14",
+          fontFamily: "Space Grotesk",
           position: "relative",
         }}
       >
-        {/* Background accent circles */}
+        {/* Signature: oversized up-chevron echoing the logo, bleeding off the right */}
         <div
           style={{
             position: "absolute",
-            top: "-80px",
-            right: "-80px",
-            width: "400px",
-            height: "400px",
-            borderRadius: "50%",
-            background: "rgba(245,158,11,0.18)",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            bottom: "-60px",
-            left: "-60px",
+            right: "62px",
+            top: "232px",
             width: "300px",
             height: "300px",
-            borderRadius: "50%",
-            background: "rgba(245,158,11,0.12)",
+            borderLeft: `30px solid ${AMBER}`,
+            borderTop: `30px solid ${AMBER}`,
+            transform: "rotate(45deg)",
           }}
         />
 
-        {/* Logo */}
+        {/* Top row */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "16px",
-            marginBottom: "40px",
+            justifyContent: "space-between",
+            zIndex: 10,
           }}
         >
-          <div
-            style={{
-              width: "64px",
-              height: "64px",
-              borderRadius: "18px",
-              background: "rgba(245,158,11,0.15)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
+          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
             <div
               style={{
-                width: "28px",
-                height: "28px",
-                borderLeft: "4px solid #F59E0B",
-                borderTop: "4px solid #F59E0B",
-                transform: "rotate(45deg) translate(4px, 4px)",
-              }}
-            />
-          </div>
-          <div style={{ display: "flex", alignItems: "baseline" }}>
-            <span style={{ fontSize: "48px", fontWeight: 800, color: "#FFFFFF" }}>born</span>
-            <span style={{ fontSize: "48px", fontWeight: 800, color: "#F59E0B" }}>works</span>
-          </div>
-        </div>
-
-        {/* Headline */}
-        <div
-          style={{
-            fontSize: "52px",
-            fontWeight: 800,
-            color: "#FFFFFF",
-            textAlign: "center",
-            lineHeight: 1.15,
-            maxWidth: "860px",
-            marginBottom: "24px",
-          }}
-        >
-          Software House Indonesia
-        </div>
-
-        {/* Subtitle */}
-        <div
-          style={{
-            fontSize: "26px",
-            color: "#94A3B8",
-            textAlign: "center",
-            maxWidth: "700px",
-            lineHeight: 1.5,
-            marginBottom: "48px",
-          }}
-        >
-          Web App · Mobile App · SaaS — dari ide sampai launch
-        </div>
-
-        {/* Badges */}
-        <div style={{ display: "flex", gap: "16px" }}>
-          {["Next.js", "Flutter", "Laravel", "TypeScript"].map((tech) => (
-            <div
-              key={tech}
-              style={{
-                background: "rgba(245,158,11,0.1)",
-                border: "1px solid rgba(245,158,11,0.3)",
-                borderRadius: "100px",
-                padding: "10px 24px",
-                fontSize: "18px",
-                fontWeight: 600,
-                color: "#FCD34D",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "44px",
+                height: "44px",
+                borderRadius: "12px",
+                background: "rgba(245,158,11,0.14)",
               }}
             >
-              {tech}
+              <div
+                style={{
+                  width: "18px",
+                  height: "18px",
+                  borderLeft: `5px solid ${AMBER}`,
+                  borderTop: `5px solid ${AMBER}`,
+                  transform: "rotate(45deg) translate(3px, 3px)",
+                }}
+              />
             </div>
-          ))}
+            <div style={{ display: "flex", fontSize: "30px", fontWeight: 700 }}>
+              <span style={{ color: INK }}>born</span>
+              <span style={{ color: AMBER }}>works</span>
+            </div>
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              fontSize: "18px",
+              fontWeight: 500,
+              letterSpacing: "4px",
+              color: MUTED,
+            }}
+          >
+            SOFTWARE STUDIO — INDONESIA
+          </div>
         </div>
 
-        {/* URL */}
-        <div
-          style={{
-            position: "absolute",
-            bottom: "36px",
-            fontSize: "20px",
-            color: "#64748B",
-            fontWeight: 500,
-          }}
-        >
-          bornworks.biz.id
+        {/* Headline + descriptor */}
+        <div style={{ display: "flex", flexDirection: "column", zIndex: 10 }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              fontSize: "104px",
+              fontWeight: 700,
+              lineHeight: 0.96,
+              letterSpacing: "-4px",
+              color: INK,
+            }}
+          >
+            <div style={{ display: "flex" }}>Where products</div>
+            <div style={{ display: "flex" }}>
+              <span>are</span>
+              <span style={{ color: AMBER, marginLeft: "0.3em" }}>born.</span>
+            </div>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              marginTop: "30px",
+              fontSize: "29px",
+              fontWeight: 500,
+              color: MUTED,
+            }}
+          >
+            Web · Mobile · SaaS — dari ide sampai launch
+          </div>
+        </div>
+
+        {/* Meta baseline */}
+        <div style={{ display: "flex", flexDirection: "column", zIndex: 10 }}>
+          <div
+            style={{ display: "flex", height: "1px", background: HAIRLINE, marginBottom: "22px" }}
+          />
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              fontSize: "21px",
+              fontWeight: 500,
+            }}
+          >
+            <span style={{ color: INK }}>bornworks.biz.id</span>
+            <span style={{ color: MUTED }}>Next.js · Flutter · Laravel · TypeScript</span>
+          </div>
         </div>
       </div>
     ),
-    { ...size }
+    {
+      ...size,
+      fonts: [
+        { name: "Space Grotesk", data: bold, weight: 700, style: "normal" },
+        { name: "Space Grotesk", data: medium, weight: 500, style: "normal" },
+      ],
+    }
   );
 }
