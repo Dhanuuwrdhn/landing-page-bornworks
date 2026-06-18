@@ -9,7 +9,13 @@ import CTA from "@/components/CTA";
 import Footer from "@/components/Footer";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 
-export default function Home() {
+// CMS integration: import the data layer
+import { getCta } from "@/lib/cms";
+
+export default async function Home() {
+  // Fetch CTA from CMS (falls back to hardcoded defaults if CMS unreachable)
+  const ctaData = await getCta();
+
   return (
     <LanguageProvider>
       <main className="flex-1">
@@ -20,7 +26,8 @@ export default function Home() {
         <Services />
         <Process />
         <Portfolio />
-        <CTA whatsappNumber={process.env.WHATSAPP_NO} />
+        {/* Pass WhatsApp number from CMS, with env-var fallback */}
+        <CTA whatsappNumber={ctaData.whatsappNumber} />
         <Footer />
       </main>
     </LanguageProvider>

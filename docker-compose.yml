@@ -13,3 +13,7 @@ services:
       - "127.0.0.1:3002:3000"
     env_file:
       - .env
+    environment:
+      CMS_ENABLED:  ${CMS_ENABLED:-true}
+      CMS_API_URL:  ${CMS_API_URL:-http://host.docker.internal:3010}
+      REVALIDATE_SECRET: ${REVALIDATE_SECRET:-}
