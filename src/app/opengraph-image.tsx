@@ -11,7 +11,7 @@ export default function OgImage() {
         style={{
           width: "1200px",
           height: "630px",
-          background: "linear-gradient(135deg, #FEF3C7 0%, #FFFFFF 40%, #FFF7E6 100%)",
+          background: "linear-gradient(135deg, #0a0e1a 0%, #15192e 50%, #1e1535 100%)",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -29,7 +29,7 @@ export default function OgImage() {
             width: "400px",
             height: "400px",
             borderRadius: "50%",
-            background: "rgba(245,158,11,0.12)",
+            background: "rgba(245,158,11,0.18)",
           }}
         />
         <div
@@ -40,7 +40,7 @@ export default function OgImage() {
             width: "300px",
             height: "300px",
             borderRadius: "50%",
-            background: "rgba(245,158,11,0.08)",
+            background: "rgba(245,158,11,0.12)",
           }}
         />
 
@@ -75,7 +75,7 @@ export default function OgImage() {
             />
           </div>
           <div style={{ display: "flex", alignItems: "baseline" }}>
-            <span style={{ fontSize: "48px", fontWeight: 800, color: "#111827" }}>born</span>
+            <span style={{ fontSize: "48px", fontWeight: 800, color: "#FFFFFF" }}>born</span>
             <span style={{ fontSize: "48px", fontWeight: 800, color: "#F59E0B" }}>works</span>
           </div>
         </div>
@@ -85,7 +85,7 @@ export default function OgImage() {
           style={{
             fontSize: "52px",
             fontWeight: 800,
-            color: "#111827",
+            color: "#FFFFFF",
             textAlign: "center",
             lineHeight: 1.15,
             maxWidth: "860px",
@@ -99,7 +99,7 @@ export default function OgImage() {
         <div
           style={{
             fontSize: "26px",
-            color: "#6B7280",
+            color: "#94A3B8",
             textAlign: "center",
             maxWidth: "700px",
             lineHeight: 1.5,
@@ -121,7 +121,7 @@ export default function OgImage() {
                 padding: "10px 24px",
                 fontSize: "18px",
                 fontWeight: 600,
-                color: "#D97706",
+                color: "#FCD34D",
               }}
             >
               {tech}
@@ -135,11 +135,11 @@ export default function OgImage() {
             position: "absolute",
             bottom: "36px",
             fontSize: "20px",
-            color: "#9CA3AF",
+            color: "#64748B",
             fontWeight: 500,
           }}
         >
-          bornworks.id
+          bornworks.biz.id
         </div>
       </div>
     ),

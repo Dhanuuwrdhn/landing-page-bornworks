@@ -113,9 +113,10 @@ export default function ContactModal({
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
         >
-          {/* Backdrop */}
+          {/* Backdrop — solid dim only. A fullscreen backdrop-filter:blur() here
+              re-rasterizes the whole page every frame and makes opening janky. */}
           <div
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/75"
             onClick={onClose}
             aria-hidden
           />
