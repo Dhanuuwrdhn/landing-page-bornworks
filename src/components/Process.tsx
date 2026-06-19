@@ -5,31 +5,25 @@ import { Search, Pen, Code2, Rocket } from "lucide-react";
 import { m } from "framer-motion";
 import { gsap } from "gsap";
 import { useLang } from "@/contexts/LanguageContext";
+import { ProcessStep } from "@/types/cms";
+import { fallbackProcess } from "@/lib/cms";
 
-/* ── Translations ─────────────────────────────────────── */
-const t = {
-  label:   { en: "How We Work",  id: "Cara Kami Bekerja" },
-  heading: { en: "Our Process",  id: "Proses Kami"       },
-  sub: {
-    en: "A proven approach that turns your idea into a shipped product.",
-    id: "Pendekatan teruji yang mengubah ide Anda menjadi produk yang siap rilis.",
-  },
+/* ── Icon mapping (CMS stores icon name as string) ─────── */
+type IconComponent = React.ComponentType<{ className?: string; strokeWidth?: number; style?: React.CSSProperties }>;
+
+const iconMap: Record<string, IconComponent> = {
+  Search,
+  Pen,
+  Code2,
+  Rocket,
 };
 
-/* ── Data ─────────────────────────────────────────────── */
-const steps = {
-  en: [
-    { icon: Search, title: "Discovery", description: "We dive deep into your vision, market, and users to define the right product strategy.", step: 1 },
-    { icon: Pen,    title: "Design",    description: "Wireframes, prototypes, and polished UI/UX — we design interfaces people love to use.",   step: 2 },
-    { icon: Code2,  title: "Build",     description: "Clean, scalable code with modern frameworks. Every feature tested and optimized.",          step: 3 },
-    { icon: Rocket, title: "Ship",      description: "Launch day and beyond — deployment, monitoring, and continuous iteration.",                 step: 4 },
-  ],
-  id: [
-    { icon: Search, title: "Riset",   description: "Kami mendalami visi, pasar, dan pengguna Anda untuk menentukan strategi produk yang tepat.",    step: 1 },
-    { icon: Pen,    title: "Desain",  description: "Wireframe, prototipe, dan UI/UX yang matang — kami mendesain antarmuka yang disukai pengguna.", step: 2 },
-    { icon: Code2,  title: "Bangun",  description: "Kode bersih dan scalable dengan framework modern. Setiap fitur diuji dan dioptimasi.",          step: 3 },
-    { icon: Rocket, title: "Rilis",   description: "Hari peluncuran dan seterusnya — deployment, monitoring, dan iterasi berkelanjutan.",            step: 4 },
-  ],
+/* ── Section labels (not in CMS — static) ─────────────── */
+const sectionT = {
+  label:   { en: "How We Work", id: "Cara Kami Bekerja" },
+  heading: { en: "Our Process",  id: "Proses Kami"       },
+  sub:     { en: "A proven approach that turns your idea into a shipped product.",
+             id: "Pendekatan teruji yang mengubah ide Anda menjadi produk yang siap rilis." },
 };
 
 /* ── Colours ──────────────────────────────────────────── */
@@ -45,10 +39,15 @@ const COLORS = ["#3b82f6", "#6366f1", "#8b5cf6", "#a78bfa"];
 */
 const RIBBON = "M 0,10 L 1000,10";
 
+/* ── Props ─────────────────────────────────────────────── */
+interface ProcessProps {
+  process?: ProcessStep[];
+}
+
 /* ── Component ────────────────────────────────────────── */
-export default function Process() {
+export default function Process({ process: processSteps }: ProcessProps) {
   const { lang } = useLang();
-  const list = steps[lang];
+  const list = processSteps ?? fallbackProcess;
   const N    = list.length;
 
   const sectionRef = useRef<HTMLElement>(null);
@@ -136,12 +135,12 @@ export default function Process() {
           transition={{ duration: 0.6 }}
         >
           <span className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-amber">
-            {t.label[lang]}
+            {sectionT.label[lang]}
           </span>
           <h2 className="mt-3 text-4xl font-extrabold text-white sm:text-5xl">
-            {t.heading[lang]}
+            {sectionT.heading[lang]}
           </h2>
-          <p className="mt-4 text-white/45 text-lg">{t.sub[lang]}</p>
+          <p className="mt-4 text-white/45 text-lg">{sectionT.sub[lang]}</p>
         </m.div>
 
         {/* ── Desktop: ribbon + cards ── */}
@@ -208,14 +207,14 @@ export default function Process() {
           {/* Cards — solid, no blur */}
           <div className="relative z-10 grid grid-cols-4 gap-5 h-full items-center">
             {list.map((step, i) => {
-              const Icon   = step.icon;
+              const Icon   = iconMap[step.icon ?? ''] ?? Search;
               const c      = COLORS[i];
               const isLit  = i <= activeIndex;
               const isCurr = i === activeIndex;
 
               return (
                 <m.div
-                  key={i}
+                  key={step.id ?? i}
                   className="flex flex-col items-center justify-center rounded-3xl p-6 text-center h-[230px]"
                   animate={{
                     y:     isCurr ? -10 : 0,
@@ -255,7 +254,7 @@ export default function Process() {
                     className="text-[10px] font-black mb-1 tabular-nums"
                     style={{ color: isLit ? c : "rgba(255,255,255,0.15)", transition: "color 0.5s" }}
                   >
-                    {String(step.step).padStart(2, "0")}
+                    {step.number}
                   </span>
 
                   {/* Title */}
@@ -263,7 +262,7 @@ export default function Process() {
                     className="font-extrabold text-sm mb-2 leading-tight"
                     style={{ color: isLit ? "#fff" : "rgba(255,255,255,0.2)", transition: "color 0.5s" }}
                   >
-                    {step.title}
+                    {step.title?.[lang] ?? step.title?.en ?? ''}
                   </h3>
 
                   {/* Description */}
@@ -271,7 +270,7 @@ export default function Process() {
                     className="text-[11px] leading-relaxed"
                     style={{ color: isLit ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.12)", transition: "color 0.5s" }}
                   >
-                    {step.description}
+                    {step.description?.[lang] ?? step.description?.en ?? ''}
                   </p>
                 </m.div>
               );
@@ -298,11 +297,11 @@ export default function Process() {
         {/* ── Mobile: vertical list ── */}
         <div className="md:hidden w-full flex flex-col gap-6">
           {list.map((step, i) => {
-            const Icon = step.icon;
+            const Icon = iconMap[step.icon ?? ''] ?? Search;
             const c    = COLORS[i];
             return (
               <m.div
-                key={i}
+                key={step.id ?? i}
                 className="flex items-start gap-4"
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
@@ -313,14 +312,14 @@ export default function Process() {
                   className="relative shrink-0 w-12 h-12 rounded-full flex items-center justify-center text-white font-black text-base"
                   style={{ background: `linear-gradient(135deg, ${c}cc, ${c}55)`, border: `1px solid ${c}55` }}
                 >
-                  {step.step}
+                  {step.number}
                 </div>
                 <div className="pt-1">
                   <div className="flex items-center gap-2 mb-1.5">
                     <Icon className="w-4 h-4 shrink-0" style={{ color: c }} strokeWidth={1.8} />
-                    <h3 className="text-sm font-bold text-white">{step.title}</h3>
+                    <h3 className="text-sm font-bold text-white">{step.title[lang]}</h3>
                   </div>
-                  <p className="text-xs text-white/45 leading-relaxed">{step.description}</p>
+                  <p className="text-xs text-white/45 leading-relaxed">{step.description[lang]}</p>
                 </div>
               </m.div>
             );

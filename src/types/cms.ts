@@ -34,8 +34,8 @@ export interface HeroSection {
 /* ── About ───────────────────────────────────────────── */
 export interface AboutValue {
   icon:  string;
-  title: string;
-  desc:  string;
+  title: LocalizedString;
+  desc:  LocalizedString;
 }
 
 export interface AboutSection {
@@ -54,6 +54,7 @@ export interface ServiceItem {
   icon:        string;
   title:       LocalizedString;
   description: LocalizedString;
+  features:    { en: string[]; id: string[] };
   order:       number;
   createdAt?:  string;
   updatedAt?:  string;
@@ -62,6 +63,7 @@ export interface ServiceItem {
 /* ── Process ─────────────────────────────────────────── */
 export interface ProcessStep {
   id:          string;
+  icon?:       string;
   number:      string;
   title:       LocalizedString;
   description: LocalizedString;

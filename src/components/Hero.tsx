@@ -4,16 +4,22 @@ import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { m } from "framer-motion";
 import { useLang } from "@/contexts/LanguageContext";
+import { HeroSection } from "@/types/cms";
+import { fallbackHero } from "@/lib/cms";
+
+/* ── Props ──────────────────────────────────────────────── */
+interface HeroProps {
+  hero?: HeroSection;
+}
 
 /* ── Typewriter ───────────────────────────────────────── */
-const wordsMap = {
-  en: ["That Matter", "People Love", "That Scale"],
-  id: ["Yang Bermakna", "Yang Disukai", "Yang Berkembang"],
-};
+interface TypewriterProps {
+  phrases: { en: string[]; id: string[] };
+}
 
-function Typewriter() {
+function Typewriter({ phrases }: TypewriterProps) {
   const { lang } = useLang();
-  const words = wordsMap[lang];
+  const words = phrases[lang];
   const [wordIndex, setWordIndex] = useState(0);
   const [charIndex, setCharIndex] = useState(0);
   const [deleting, setDeleting] = useState(false);
@@ -86,25 +92,16 @@ function GeometricBg() {
   );
 }
 
-/* ── Translations ─────────────────────────────────────── */
-const t = {
-  badge: { en: "Where Products Are Born", id: "Tempat Produk Dilahirkan" },
-  headline: { en: "We Build Digital Products", id: "Kami Membangun Produk Digital" },
-  sub1: {
-    en: "From idea to launch — we craft web apps, mobile apps, and SaaS platforms.",
-    id: "Dari ide hingga peluncuran — kami membangun web app, mobile app, dan platform SaaS.",
-  },
-  sub2: {
+/* ── Component ────────────────────────────────────────── */
+export default function Hero({ hero }: HeroProps) {
+  const { lang } = useLang();
+  const data = hero ?? fallbackHero;
+
+  // Static second subtitle line (not in CMS)
+  const sub2 = {
     en: "All without slowing down your business.",
     id: "Tanpa mengganggu bisnis utama Anda.",
-  },
-  cta1: { en: "Start a Project", id: "Mulai Project" },
-  cta2: { en: "See Our Work", id: "Lihat Karya Kami" },
-};
-
-/* ── Component ────────────────────────────────────────── */
-export default function Hero() {
-  const { lang } = useLang();
+  };
 
   return (
     <section id="hero" className="relative overflow-x-hidden flex flex-col min-h-screen rounded-b-[2.5rem] z-10">
@@ -118,7 +115,7 @@ export default function Hero() {
           transition={{ duration: 0.4 }}
           className="mb-5 text-xs font-semibold uppercase tracking-[0.18em] text-brand-amber"
         >
-          {t.badge[lang]}
+          {data.eyebrow[lang]}
         </m.p>
 
         <m.h1
@@ -127,9 +124,9 @@ export default function Hero() {
           transition={{ duration: 0.55, delay: 0.1 }}
           className="text-5xl font-extrabold leading-[1.06] tracking-tight text-white sm:text-6xl lg:text-7xl xl:text-[5.25rem] max-w-3xl"
         >
-          {t.headline[lang]}
+          {data.titleLines[0][lang]}
           <br />
-          <Typewriter key={lang} />
+          <Typewriter key={lang} phrases={data.typewriterPhrases} />
         </m.h1>
 
         <m.div
@@ -140,29 +137,29 @@ export default function Hero() {
         >
           <div className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-5 max-w-2xl">
             <p className="text-sm leading-relaxed text-white/55 max-w-[260px]">
-              {t.sub1[lang]}
+              {data.subtitle[lang]}
             </p>
             <ArrowRight className="w-4 h-4 mt-0.5 shrink-0 text-white/25 hidden sm:block" />
             <p className="text-sm leading-relaxed text-white/55 max-w-[180px]">
-              {t.sub2[lang]}
+              {sub2[lang]}
             </p>
           </div>
 
           <div className="flex gap-3 shrink-0">
             <a
-              href="#contact"
+              href={data.primaryCta.href}
               id="hero-cta-primary"
               className="group inline-flex items-center gap-2 rounded-xl bg-brand-amber px-6 py-3 text-sm font-semibold text-white hover:bg-brand-amber-dark transition-colors"
             >
-              {t.cta1[lang]}
+              {data.primaryCta.label[lang]}
               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
             </a>
             <a
-              href="#portfolio"
+              href={data.secondaryCta.href}
               id="hero-cta-secondary"
               className="inline-flex items-center gap-2 rounded-xl border border-white/20 px-6 py-3 text-sm font-semibold text-white hover:bg-white/8 transition-colors"
             >
-              {t.cta2[lang]}
+              {data.secondaryCta.label[lang]}
             </a>
           </div>
         </m.div>

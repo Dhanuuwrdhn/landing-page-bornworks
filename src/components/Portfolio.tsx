@@ -7,29 +7,13 @@ import { m, AnimatePresence } from "framer-motion";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useLang } from "@/contexts/LanguageContext";
+import { PortfolioItem } from "@/types/cms";
+import { fallbackPortfolio } from "@/lib/cms";
 
-/* ── Translations ─────────────────────────────────────── */
-const t = {
-  label: { en: "Portfolio",     id: "Portofolio"    },
-  view:  { en: "View Project",  id: "Lihat Project" },
-};
-
-/* ── Data ─────────────────────────────────────────────── */
-const projects = {
-  en: [
-    { title: "SPEKTRA — Transmission Risk Monitoring", description: "Monitoring system for PLN's power transmission tower vulnerabilities — real-time risk mapping, field inspection, and a reporting dashboard.", tags: ["Next.js", "NestJS"],     accent: "from-sky-400 to-cyan-500",      bg: "from-sky-100    to-cyan-100   dark:from-sky-900/40    dark:to-cyan-900/40",   url: "https://spektra.biz.id/login", image: "/porto/spektra-login.webp" },
-    { title: "Financial Planning App",     description: "Personal finance management with budgeting, expense tracking, and investment portfolio insights. Built for Android.", tags: ["Android", "Flutter"],   accent: "from-amber-400 to-orange-500",   bg: "from-amber-100  to-orange-100  dark:from-amber-900/40  dark:to-orange-900/40", url: "", image: "" },
-    { title: "Company Profile + CMS",      description: "SEO-optimised company website with headless CMS, blazing-fast page loads, and an intuitive admin dashboard.",        tags: ["Next.js", "TypeScript"], accent: "from-blue-400 to-indigo-500",    bg: "from-blue-100   to-indigo-100  dark:from-blue-900/40   dark:to-indigo-900/40", url: "", image: "" },
-    { title: "Restaurant Ordering System", description: "QR-based ordering with real-time kitchen display, table management, and integrated payment gateway.",                tags: ["Vue.js", "Express"],     accent: "from-emerald-400 to-teal-500",  bg: "from-emerald-100 to-teal-100  dark:from-emerald-900/40 dark:to-teal-900/40",  url: "", image: "" },
-    { title: "SaaS Analytics Dashboard",   description: "Real-time analytics with role-based access, custom charts, and webhook integrations for a B2B SaaS startup.",       tags: ["React", "Node.js"],      accent: "from-violet-400 to-purple-500", bg: "from-violet-100 to-purple-100 dark:from-violet-900/40  dark:to-purple-900/40", url: "", image: "" },
-  ],
-  id: [
-    { title: "SPEKTRA — Pemantauan Kerawanan Transmisi", description: "Sistem pemantauan kerawanan tower transmisi listrik PLN — pemetaan risiko real-time, inspeksi lapangan, dan dashboard pelaporan.", tags: ["Next.js", "NestJS"],     accent: "from-sky-400 to-cyan-500",      bg: "from-sky-100    to-cyan-100   dark:from-sky-900/40    dark:to-cyan-900/40",   url: "https://spektra.biz.id/login", image: "/porto/spektra-login.webp" },
-    { title: "Aplikasi Perencanaan Keuangan", description: "Manajemen keuangan pribadi dengan budgeting, pelacakan pengeluaran, dan insight portofolio investasi.",           tags: ["Android", "Flutter"],   accent: "from-amber-400 to-orange-500",   bg: "from-amber-100  to-orange-100  dark:from-amber-900/40  dark:to-orange-900/40", url: "", image: "" },
-    { title: "Company Profile + CMS",         description: "Website company profile dengan headless CMS, loading super cepat, dan dashboard admin intuitif.",                tags: ["Next.js", "TypeScript"], accent: "from-blue-400 to-indigo-500",    bg: "from-blue-100   to-indigo-100  dark:from-blue-900/40   dark:to-indigo-900/40", url: "", image: "" },
-    { title: "Sistem Pemesanan Restoran",      description: "Pemesanan berbasis QR dengan tampilan dapur real-time, manajemen meja, dan pembayaran terintegrasi.",            tags: ["Vue.js", "Express"],     accent: "from-emerald-400 to-teal-500",  bg: "from-emerald-100 to-teal-100  dark:from-emerald-900/40 dark:to-teal-900/40",  url: "", image: "" },
-    { title: "Dashboard Analitik SaaS",       description: "Analitik real-time dengan akses berbasis peran, grafik kustom, dan integrasi webhook untuk startup B2B.",        tags: ["React", "Node.js"],      accent: "from-violet-400 to-purple-500", bg: "from-violet-100 to-purple-100 dark:from-violet-900/40  dark:to-purple-900/40", url: "", image: "" },
-  ],
+/* ── Section labels (not in CMS — static) ─────────────── */
+const sectionT = {
+  label: { en: "Portfolio",    id: "Portofolio"    },
+  view:  { en: "View Project", id: "Lihat Project" },
 };
 
 /* ── Image panel variants (film-camera slide) ─────────── */
@@ -42,11 +26,6 @@ const filmVariants = {
 };
 
 /* ── SlipWords — light-year text reveal ───────────────── */
-// Each word is clipped inside an overflow:hidden span.
-// The inner motion.span rushes from below (y 115%→0) with a slight
-// initial rotation that snaps to 0 — the "light-year" feel comes from
-// the aggressive exponential-out ease and the per-word stagger.
-// Only the ENTER is animated here; the container handles the EXIT.
 function SlipWords({ text, baseDelay = 0 }: { text: string; baseDelay?: number }) {
   return (
     <>
@@ -62,7 +41,7 @@ function SlipWords({ text, baseDelay = 0 }: { text: string; baseDelay?: number }
             transition={{
               duration: 0.65,
               delay: baseDelay + i * 0.048,
-              ease: [0.16, 1, 0.3, 1], // expo-out — fast rush, soft settle
+              ease: [0.16, 1, 0.3, 1],
             }}
           >
             {word}&nbsp;
@@ -73,10 +52,15 @@ function SlipWords({ text, baseDelay = 0 }: { text: string; baseDelay?: number }
   );
 }
 
+/* ── Props ─────────────────────────────────────────────── */
+interface PortfolioProps {
+  portfolio?: PortfolioItem[];
+}
+
 /* ── Component ────────────────────────────────────────── */
-export default function Portfolio() {
+export default function Portfolio({ portfolio }: PortfolioProps) {
   const { lang } = useLang();
-  const list = projects[lang];
+  const list = portfolio ?? fallbackPortfolio;
   const N    = list.length;
 
   const sectionRef = useRef<HTMLElement>(null);
@@ -153,18 +137,18 @@ export default function Portfolio() {
       id="portfolio"
       className="relative bg-white dark:bg-[#0a0e1a]"
     >
-      {/* ══ MOBILE (< md): simple vertical card list, normal scroll ══ */}
+      {/* MOBILE (< md): simple vertical card list, normal scroll */}
       <div className="md:hidden px-4 sm:px-6 py-20">
         <div className="mb-8">
           <span className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-amber">
-            {t.label[lang]}
+            {sectionT.label[lang]}
           </span>
         </div>
 
         <div className="flex flex-col gap-8">
           {list.map((p, i) => (
             <m.article
-              key={i}
+              key={p.id ?? i}
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
@@ -172,13 +156,13 @@ export default function Portfolio() {
               className="overflow-hidden rounded-2xl border border-brand-dark/8 dark:border-white/8 bg-brand-light dark:bg-white/[0.03]"
             >
               {/* Image / decorative panel */}
-              <div className={`relative aspect-[16/10] bg-gradient-to-br ${p.bg} flex items-center justify-center`}>
-                {p.image ? (
+              <div className={`relative aspect-[16/10] bg-gradient-to-br ${p.bgClass} flex items-center justify-center`}>
+                {p.imageUrl ? (
                   <div className="absolute inset-0 p-4">
                     <div className="relative w-full h-full">
                       <Image
-                        src={p.image}
-                        alt={p.title}
+                        src={p.imageUrl}
+                        alt={p.title[lang]}
                         fill
                         sizes="100vw"
                         className="object-contain drop-shadow-xl"
@@ -187,8 +171,8 @@ export default function Portfolio() {
                   </div>
                 ) : (
                   <div className="relative">
-                    <div className={`w-28 h-28 rounded-2xl bg-gradient-to-br ${p.accent} shadow-xl shadow-black/20`} />
-                    <div className={`absolute -bottom-4 -right-4 w-16 h-16 rounded-xl bg-gradient-to-br ${p.accent} opacity-40`} />
+                    <div className={`w-28 h-28 rounded-2xl bg-gradient-to-br ${p.accentClass} shadow-xl shadow-black/20`} />
+                    <div className={`absolute -bottom-4 -right-4 w-16 h-16 rounded-xl bg-gradient-to-br ${p.accentClass} opacity-40`} />
                   </div>
                 )}
               </div>
@@ -196,7 +180,7 @@ export default function Portfolio() {
               {/* Text */}
               <div className="p-5">
                 <div className="flex flex-wrap gap-2 mb-3">
-                  {p.tags.map((tag) => (
+                  {(p.tags?.[lang] ?? p.tags?.en ?? []).map((tag) => (
                     <span
                       key={tag}
                       className="rounded-lg bg-brand-amber/10 px-2.5 py-1 text-[11px] font-semibold text-brand-amber-dark dark:text-brand-amber"
@@ -206,10 +190,10 @@ export default function Portfolio() {
                   ))}
                 </div>
                 <h3 className="text-xl font-extrabold leading-tight text-brand-dark dark:text-white">
-                  {p.title}
+                  {p.title[lang]}
                 </h3>
                 <p className="mt-2 text-sm leading-relaxed text-brand-muted dark:text-white/50">
-                  {p.description}
+                  {p.description[lang]}
                 </p>
                 {p.url && (
                   <a
@@ -218,7 +202,7 @@ export default function Portfolio() {
                     rel="noopener noreferrer"
                     className="group mt-4 inline-flex items-center gap-2 text-sm font-semibold text-brand-amber"
                   >
-                    {t.view[lang]}
+                    {sectionT.view[lang]}
                     <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                   </a>
                 )}
@@ -228,10 +212,10 @@ export default function Portfolio() {
         </div>
       </div>
 
-      {/* ══ DESKTOP (md+): pinned film-slider ══ */}
+      {/* DESKTOP (md+): pinned film-slider */}
       <div className="hidden md:flex" style={{ height: "100vh" }}>
 
-        {/* ── LEFT: image panel — film-camera horizontal slide ── */}
+        {/* LEFT: image panel — film-camera horizontal slide */}
         <div className="relative w-[55%] overflow-hidden">
           <AnimatePresence mode="sync" custom={direction}>
             <m.div
@@ -242,15 +226,15 @@ export default function Portfolio() {
               animate="animate"
               exit="exit"
               transition={{ duration: 0.75, ease: [0.76, 0, 0.24, 1] }}
-              className={`absolute inset-0 bg-gradient-to-br ${project.bg} flex items-center justify-center`}
+              className={`absolute inset-0 bg-gradient-to-br ${project.bgClass} flex items-center justify-center`}
             >
-              {project.image ? (
+              {project.imageUrl ? (
                 /* Project screenshot — shown in full (no crop) on the gradient */
                 <div className="absolute inset-0 flex items-center justify-center p-8 sm:p-12 lg:p-16">
                   <div className="relative w-full h-full">
                     <Image
-                      src={project.image}
-                      alt={project.title}
+                      src={project.imageUrl}
+                      alt={project.title[lang]}
                       fill
                       priority={activeIndex === 0}
                       sizes="55vw"
@@ -270,9 +254,9 @@ export default function Portfolio() {
 
                   {/* Decorative accent shapes */}
                   <div className="relative">
-                    <div className={`w-52 h-52 rounded-[2rem] bg-gradient-to-br ${project.accent} shadow-2xl shadow-black/20`} />
-                    <div className={`absolute -bottom-6 -right-6 w-32 h-32 rounded-2xl bg-gradient-to-br ${project.accent} opacity-40`} />
-                    <div className={`absolute -top-6  -left-6  w-20 h-20 rounded-xl   bg-gradient-to-br ${project.accent} opacity-25`} />
+                    <div className={`w-52 h-52 rounded-[2rem] bg-gradient-to-br ${project.accentClass} shadow-2xl shadow-black/20`} />
+                    <div className={`absolute -bottom-6 -right-6 w-32 h-32 rounded-2xl bg-gradient-to-br ${project.accentClass} opacity-40`} />
+                    <div className={`absolute -top-6  -left-6  w-20 h-20 rounded-xl   bg-gradient-to-br ${project.accentClass} opacity-25`} />
                   </div>
                 </>
               )}
@@ -280,20 +264,17 @@ export default function Portfolio() {
           </AnimatePresence>
         </div>
 
-        {/* ── RIGHT: text panel ── */}
+        {/* RIGHT: text panel */}
         <div className="relative w-[45%] overflow-hidden">
 
           {/* Static label — always visible */}
           <div className="absolute top-12 left-14 z-10">
             <span className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-amber">
-              {t.label[lang]}
+              {sectionT.label[lang]}
             </span>
           </div>
 
-          {/* Animated text block:
-              - Whole container: scrolls upward on exit (y 0 → -6%), enters from below (y 6% → 0)
-              - Title words: individual light-year slip on enter
-              - Description + CTA: staggered fade after title lands            */}
+          {/* Animated text block */}
           <AnimatePresence mode="sync">
             <m.div
               key={activeIndex}
@@ -305,7 +286,7 @@ export default function Portfolio() {
             >
               {/* Tags */}
               <div className="flex flex-wrap gap-2">
-                {project.tags.map((tag, i) => (
+                {(project.tags?.[lang] ?? project.tags?.en ?? []).map((tag, i) => (
                   <m.span
                     key={tag}
                     initial={{ opacity: 0, y: 10 }}
@@ -320,17 +301,17 @@ export default function Portfolio() {
 
               {/* Title — word-by-word light-year slip */}
               <h2 className="text-4xl lg:text-5xl xl:text-[3.25rem] font-extrabold leading-[1.06] text-brand-dark dark:text-white">
-                <SlipWords text={project.title} baseDelay={0.05} />
+                <SlipWords text={project.title[lang]} baseDelay={0.05} />
               </h2>
 
-              {/* Description — slides in as a single block after title settles */}
+              {/* Description */}
               <m.p
                 className="text-base leading-relaxed text-brand-muted dark:text-white/50 max-w-sm"
                 initial={{ y: 22, opacity: 0 }}
                 animate={{ y: 0,  opacity: 1 }}
                 transition={{ delay: 0.32, duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
               >
-                {project.description}
+                {project.description[lang]}
               </m.p>
 
               {/* CTA */}
@@ -346,12 +327,12 @@ export default function Portfolio() {
                     rel="noopener noreferrer"
                     className="group inline-flex items-center gap-2 text-sm font-semibold text-brand-amber hover:text-brand-amber-dark transition-colors"
                   >
-                    {t.view[lang]}
+                    {sectionT.view[lang]}
                     <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                   </a>
                 ) : (
                   <button className="group inline-flex items-center gap-2 text-sm font-semibold text-brand-amber hover:text-brand-amber-dark transition-colors">
-                    {t.view[lang]}
+                    {sectionT.view[lang]}
                     <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                   </button>
                 )}

@@ -9,26 +9,26 @@ import CTA from "@/components/CTA";
 import Footer from "@/components/Footer";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 
-// CMS integration: import the data layer
-import { getCta } from "@/lib/cms";
+// CMS integration: import the full data layer
+import { getCmsPageData } from "@/lib/cms";
 
 export default async function Home() {
-  // Fetch CTA from CMS (falls back to hardcoded defaults if CMS unreachable)
-  const ctaData = await getCta();
+  // Fetch all CMS page data in parallel (falls back to hardcoded defaults if CMS unreachable)
+  const { hero, about, services, process, portfolio, cta, footer } = await getCmsPageData();
 
   return (
     <LanguageProvider>
       <main className="flex-1">
         <ScrollProgress />
         <Navbar />
-        <Hero />
-        <About />
-        <Services />
-        <Process />
-        <Portfolio />
+        <Hero hero={hero} />
+        <About about={about} />
+        <Services services={services} />
+        <Process process={process} />
+        <Portfolio portfolio={portfolio} />
         {/* Pass WhatsApp number from CMS, with env-var fallback */}
-        <CTA whatsappNumber={ctaData.whatsappNumber} />
-        <Footer />
+        <CTA whatsappNumber={cta.whatsappNumber} />
+        <Footer footer={footer} />
       </main>
     </LanguageProvider>
   );

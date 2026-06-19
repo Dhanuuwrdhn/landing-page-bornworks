@@ -2,30 +2,19 @@
 
 import { ArrowUp, ChevronRight } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
+import { FooterSection } from "@/types/cms";
+import { fallbackFooter } from "@/lib/cms";
 
-const t = {
-  desc: {
-    en: "Where Products Are Born. We craft digital products \u2014 web apps, mobile apps, and SaaS platforms \u2014 that make a difference.",
-    id: "Tempat Produk Dilahirkan. Kami membangun produk digital \u2014 web app, mobile app, dan platform SaaS \u2014 yang membuat perbedaan.",
-  },
-  rights: { en: "All rights reserved.", id: "Hak cipta dilindungi." },
-  backTop: { en: "Back to top", id: "Kembali ke atas" },
-};
+/* ── Props ─────────────────────────────────────────────── */
+interface FooterProps {
+  footer?: FooterSection;
+}
 
-const footerLinksMap = {
-  en: [
-    { title: "Company", links: [{ label: "About", href: "#about" }, { label: "Services", href: "#services" }, { label: "Portfolio", href: "#portfolio" }, { label: "Contact", href: "#contact" }] },
-    { title: "Services", links: [{ label: "Web App Development", href: "#services" }, { label: "Mobile App (Android)", href: "#services" }, { label: "SaaS Product", href: "#services" }] },
-  ],
-  id: [
-    { title: "Perusahaan", links: [{ label: "Tentang", href: "#about" }, { label: "Layanan", href: "#services" }, { label: "Portofolio", href: "#portfolio" }, { label: "Kontak", href: "#contact" }] },
-    { title: "Layanan", links: [{ label: "Pengembangan Web App", href: "#services" }, { label: "Mobile App (Android)", href: "#services" }, { label: "Produk SaaS", href: "#services" }] },
-  ],
-};
-
-export default function Footer() {
+/* ── Component ────────────────────────────────────────── */
+export default function Footer({ footer }: FooterProps) {
   const { lang } = useLang();
-  const footerLinks = footerLinksMap[lang];
+  const data = footer ?? fallbackFooter;
+  const footerLinks = data.linkGroups[lang];
 
   return (
     <footer id="footer" className="bg-brand-dark dark:bg-[#060912]">
@@ -41,13 +30,13 @@ export default function Footer() {
                 <span className="text-brand-amber">works</span>
               </span>
             </a>
-            <p className="text-white/50 max-w-sm leading-relaxed mt-4">{t.desc[lang]}</p>
+            <p className="text-white/50 max-w-sm leading-relaxed mt-4">{data.desc[lang]}</p>
             <div className="mt-6 space-y-2">
               <p className="text-sm text-white/40">
-                <span className="text-white/60 font-medium">Email:</span> hello@bornworks.id
+                <span className="text-white/60 font-medium">Email:</span> {data.email}
               </p>
               <p className="text-sm text-white/40">
-                <span className="text-white/60 font-medium">Location:</span> Indonesia
+                <span className="text-white/60 font-medium">Location:</span> {data.location}
               </p>
             </div>
           </div>
@@ -69,10 +58,12 @@ export default function Footer() {
         </div>
         <div className="mt-12 border-t border-white/10 pt-8">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <p className="text-sm text-white/30">&copy; 2026 bornworks. PT Lahir Karya Semesta. {t.rights[lang]}</p>
+            <p className="text-sm text-white/30">
+              &copy; 2026 {data.copyrightName}. {data.rights[lang]}
+            </p>
             <a href="#" className="flex items-center gap-2 text-sm text-white/30 hover:text-brand-amber transition-colors">
               <ArrowUp className="w-4 h-4" />
-              {t.backTop[lang]}
+              {data.backTop[lang]}
             </a>
           </div>
         </div>

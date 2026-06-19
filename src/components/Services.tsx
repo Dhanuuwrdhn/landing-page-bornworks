@@ -3,77 +3,35 @@
 import { Monitor, Smartphone, Layers, CheckCircle2 } from "lucide-react";
 import { m } from "framer-motion";
 import { useLang } from "@/contexts/LanguageContext";
+import { ServiceItem } from "@/types/cms";
+import { fallbackServices } from "@/lib/cms";
 
-/* ── Translations ─────────────────────────────────────── */
-const t = {
-  label: { en: "What We Build", id: "Yang Kami Bangun" },
-  heading: { en: "Our Services", id: "Layanan Kami" },
-  sub: {
-    en: "Three core disciplines — every product we build falls into one of these.",
-    id: "Tiga disiplin utama — setiap produk yang kami bangun ada di salah satunya.",
-  },
+/* ── Icon mapping (CMS stores icon name as string) ─────── */
+type IconComponent = React.ComponentType<{ className?: string; strokeWidth?: number }>;
+
+const iconMap: Record<string, IconComponent> = {
+  Monitor,
+  Smartphone,
+  Layers,
 };
 
-/* ── Data ─────────────────────────────────────────────── */
-const services = {
-  en: [
-    {
-      icon: Monitor,
-      num: "01",
-      title: "Web App Development",
-      description:
-        "Modern, responsive web applications built with cutting-edge frameworks. From dashboards to complex platforms, we deliver performant and scalable solutions.",
-      features: ["Next.js & React", "Performance-first", "Responsive & accessible"],
-    },
-    {
-      icon: Smartphone,
-      num: "02",
-      title: "Mobile App (Android)",
-      description:
-        "Native-quality Android applications using Flutter. Beautiful interfaces, smooth animations, and seamless user experiences across every screen size.",
-      features: ["Flutter (Android)", "Native-quality UX", "Offline-capable"],
-    },
-    {
-      icon: Layers,
-      num: "03",
-      title: "SaaS Product",
-      description:
-        "End-to-end SaaS development from architecture to deployment. Scalable multi-tenant platforms with subscription management, analytics, and integrations.",
-      features: ["Multi-tenant architecture", "Subscription billing", "Analytics & reporting"],
-    },
-  ],
-  id: [
-    {
-      icon: Monitor,
-      num: "01",
-      title: "Pengembangan Web App",
-      description:
-        "Aplikasi web modern dan responsif dengan framework terbaru. Dari dashboard hingga platform kompleks, kami membangun solusi yang performan dan scalable.",
-      features: ["Next.js & React", "Prioritas performa", "Responsif & aksesibel"],
-    },
-    {
-      icon: Smartphone,
-      num: "02",
-      title: "Mobile App (Android)",
-      description:
-        "Aplikasi Android berkualitas native menggunakan Flutter. Antarmuka indah, animasi halus, dan pengalaman pengguna yang mulus di setiap ukuran layar.",
-      features: ["Flutter (Android)", "UX berkualitas native", "Dukungan offline"],
-    },
-    {
-      icon: Layers,
-      num: "03",
-      title: "Produk SaaS",
-      description:
-        "Pengembangan SaaS dari arsitektur hingga deployment. Platform multi-tenant scalable dengan manajemen langganan, analytics, dan berbagai integrasi.",
-      features: ["Arsitektur multi-tenant", "Billing langganan", "Analytics & pelaporan"],
-    },
-  ],
+/* ── Section label (not in CMS — static) ──────────────── */
+const sectionLabel = {
+  label:   { en: "What We Build", id: "Yang Kami Bangun" },
+  heading: { en: "Our Services",  id: "Layanan Kami"     },
+  sub:     { en: "Three core disciplines — every product we build falls into one of these.",
+             id: "Tiga disiplin utama — setiap produk yang kami bangun ada di salah satunya." },
 };
+
+/* ── Props ─────────────────────────────────────────────── */
+interface ServicesProps {
+  services?: ServiceItem[];
+}
 
 /* ── Component ────────────────────────────────────────── */
-export default function Services() {
+export default function Services({ services }: ServicesProps) {
   const { lang } = useLang();
-  const list = services[lang];
+  const list = services ?? fallbackServices;
 
   return (
     <section
@@ -91,23 +49,26 @@ export default function Services() {
           transition={{ duration: 0.55 }}
         >
           <span className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-amber">
-            {t.label[lang]}
+            {sectionLabel.label[lang]}
           </span>
           <h2 className="mt-3 text-4xl font-extrabold text-brand-dark dark:text-white sm:text-5xl">
-            {t.heading[lang]}
+            {sectionLabel.heading[lang]}
           </h2>
           <p className="mt-3 text-brand-muted dark:text-white/50 max-w-lg">
-            {t.sub[lang]}
+            {sectionLabel.sub[lang]}
           </p>
         </m.div>
 
         {/* Service rows */}
         <div className="border-t border-brand-dark/8 dark:border-white/8">
           {list.map((svc, i) => {
-            const Icon = svc.icon;
+            const Icon = iconMap[svc.icon] ?? Monitor;
+            const num  = String(i + 1).padStart(2, "0");
+            const features = svc.features?.[lang] ?? svc.features?.en ?? [];
+
             return (
               <m.div
-                key={i}
+                key={svc.id ?? i}
                 className="group relative grid grid-cols-1 md:grid-cols-[88px_1fr_220px] gap-6 md:gap-10 border-b border-brand-dark/8 dark:border-white/8 py-10 md:py-12"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -120,7 +81,7 @@ export default function Services() {
                 {/* Column 1 — number + icon */}
                 <div className="flex md:flex-col items-center md:items-start gap-4">
                   <span className="text-5xl font-black leading-none select-none text-brand-dark/[0.07] dark:text-white/[0.07] group-hover:text-brand-amber transition-colors duration-300">
-                    {svc.num}
+                    {num}
                   </span>
                   <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-amber/10 group-hover:bg-brand-amber/20 transition-colors duration-300">
                     <Icon className="w-6 h-6 text-brand-amber" strokeWidth={1.8} />
@@ -130,16 +91,16 @@ export default function Services() {
                 {/* Column 2 — title + description */}
                 <div>
                   <h3 className="text-xl font-extrabold text-brand-dark dark:text-white mb-3 group-hover:text-brand-amber transition-colors duration-300">
-                    {svc.title}
+                    {svc.title[lang]}
                   </h3>
                   <p className="text-brand-muted dark:text-white/50 leading-relaxed">
-                    {svc.description}
+                    {svc.description[lang]}
                   </p>
                 </div>
 
                 {/* Column 3 — feature list */}
                 <ul className="flex flex-col gap-2.5 md:pt-1">
-                  {svc.features.map((f, j) => (
+                  {features.map((f, j) => (
                     <li
                       key={j}
                       className="flex items-center gap-2 text-sm text-brand-muted dark:text-white/45"

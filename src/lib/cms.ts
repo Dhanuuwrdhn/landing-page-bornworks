@@ -50,7 +50,7 @@ export const fallbackHero = {
 export const fallbackAbout = {
   label:   { en: 'About us', id: 'Tentang kami' },
   heading: { en: 'A small team of builders who care deeply about the craft',
-             id: 'Tim kecil yang sangat peduli dengan kualitas hasil kerja' },
+            id: 'Tim kecil yang sangat peduli dengan kualitas hasil kerja' },
   sub: {
     en: 'Born2Works was founded on a simple belief: great software changes how people live and work. Based in Indonesia, we partner with founders and businesses who want digital products done right — fast, clean, and built to last.',
     id: 'Born2Works didirikan atas satu keyakinan: software yang bagus mengubah cara orang hidup dan bekerja. Berbasis di Indonesia, kami bermitra dengan founder dan bisnis yang menginginkan produk digital yang benar — cepat, bersih, dan tahan lama.',
@@ -58,20 +58,21 @@ export const fallbackAbout = {
   badge: { en: 'Based in Indonesia \u00b7 Est. 2024', id: 'Berbasis di Indonesia \u00b7 Berdiri 2024' },
   values: {
     en: [
-      { icon: 'Zap',    title: 'Move fast',   desc: 'We ship early and iterate quickly. No over-engineering, no endless planning.' },
-      { icon: 'Shield', title: 'Build right', desc: 'Quality code, tested features, and clean architecture \u2014 every time.' },
-      { icon: 'Eye',    title: 'Stay honest', desc: 'Regular updates, transparent timelines, no surprises.' },
+      { icon: 'Zap',    title: { en: 'Move fast',      id: 'Bergerak cepat'     }, desc: { en: 'We ship early and iterate quickly. No over-engineering, no endless planning.', id: 'Kami ship lebih awal dan iterasi cepat. Tanpa over-engineering.' } },
+      { icon: 'Shield', title: { en: 'Build right',    id: 'Bangun dengan benar' }, desc: { en: 'Quality code, tested features, and clean architecture \u2014 every time.', id: 'Kode berkualitas, fitur teruji, dan arsitektur bersih.' } },
+      { icon: 'Eye',    title: { en: 'Stay honest',   id: 'Tetap jujur'         }, desc: { en: 'Regular updates, transparent timelines, no surprises.', id: 'Update rutin, timeline transparan, tanpa kejutan.' } },
     ],
     id: [
-      { icon: 'Zap',    title: 'Bergerak cepat',     desc: 'Kami ship lebih awal dan iterasi cepat. Tanpa over-engineering.' },
-      { icon: 'Shield', title: 'Bangun dengan benar', desc: 'Kode berkualitas, fitur teruji, dan arsitektur bersih.' },
-      { icon: 'Eye',    title: 'Tetap jujur',        desc: 'Update rutin, timeline transparan, tanpa kejutan.' },
+      { icon: 'Zap',    title: { en: 'Move fast',      id: 'Bergerak cepat'     }, desc: { en: 'We ship early and iterate quickly. No over-engineering, no endless planning.', id: 'Kami ship lebih awal dan iterasi cepat. Tanpa over-engineering.' } },
+      { icon: 'Shield', title: { en: 'Build right',    id: 'Bangun dengan benar' }, desc: { en: 'Quality code, tested features, and clean architecture \u2014 every time.', id: 'Kode berkualitas, fitur teruji, dan arsitektur bersih.' } },
+      { icon: 'Eye',    title: { en: 'Stay honest',   id: 'Tetap jujur'         }, desc: { en: 'Regular updates, transparent timelines, no surprises.', id: 'Update rutin, timeline transparan, tanpa kejutan.' } },
     ],
   },
 };
 
 export const fallbackServices = [
   {
+    id: 'svc-web',
     icon: 'Monitor',
     title:       { en: 'Web App Development',   id: 'Pengembangan Web App' },
     description: { en: 'Modern, responsive web applications built with cutting-edge frameworks. From dashboards to complex platforms, we deliver performant and scalable solutions.',
@@ -81,6 +82,7 @@ export const fallbackServices = [
     order: 0,
   },
   {
+    id: 'svc-mobile',
     icon: 'Smartphone',
     title:       { en: 'Mobile App (Android)', id: 'Mobile App (Android)' },
     description: { en: 'Native-quality Android applications using Flutter.',
@@ -90,6 +92,7 @@ export const fallbackServices = [
     order: 1,
   },
   {
+    id: 'svc-saas',
     icon: 'Layers',
     title:       { en: 'SaaS Product', id: 'Produk SaaS' },
     description: { en: 'End-to-end SaaS development from architecture to deployment.',
@@ -101,18 +104,18 @@ export const fallbackServices = [
 ];
 
 export const fallbackProcess = [
-  { number: '01', title: { en: 'Discovery', id: 'Riset'   }, description: { en: 'We dive deep into your vision, market, and users.', id: 'Kami mendalami visi, pasar, dan pengguna Anda.' }, order: 0 },
-  { number: '02', title: { en: 'Design',    id: 'Desain'  }, description: { en: 'Wireframes, prototypes, and polished UI/UX.',        id: 'Wireframe, prototipe, dan UI/UX yang matang.'  }, order: 1 },
-  { number: '03', title: { en: 'Build',     id: 'Bangun'  }, description: { en: 'Clean, scalable code with modern frameworks.',        id: 'Kode bersih dan scalable dengan framework modern.' }, order: 2 },
-  { number: '04', title: { en: 'Ship',      id: 'Rilis'   }, description: { en: 'Deployment, monitoring, and continuous iteration.',  id: 'Deployment, monitoring, dan iterasi berkelanjutan.' }, order: 3 },
+  { id: 'proc-01', icon: 'Search',  number: '01', title: { en: 'Discovery', id: 'Riset'   }, description: { en: 'We dive deep into your vision, market, and users.', id: 'Kami mendalami visi, pasar, dan pengguna Anda.' }, order: 0 },
+  { id: 'proc-02', icon: 'Pen',     number: '02', title: { en: 'Design',    id: 'Desain'  }, description: { en: 'Wireframes, prototypes, and polished UI/UX.',        id: 'Wireframe, prototipe, dan UI/UX yang matang.'  }, order: 1 },
+  { id: 'proc-03', icon: 'Code2',   number: '03', title: { en: 'Build',     id: 'Bangun'  }, description: { en: 'Clean, scalable code with modern frameworks.',        id: 'Kode bersih dan scalable dengan framework modern.' }, order: 2 },
+  { id: 'proc-04', icon: 'Rocket',  number: '04', title: { en: 'Ship',     id: 'Rilis'   }, description: { en: 'Deployment, monitoring, and continuous iteration.',  id: 'Deployment, monitoring, dan iterasi berkelanjutan.' }, order: 3 },
 ];
 
 export const fallbackPortfolio = [
-  { title: { en: 'SPEKTRA \u2014 Transmission Risk Monitoring', id: 'SPEKTRA \u2014 Pemantauan Kerawanan Transmisi' }, description: { en: "Monitoring system for PLN's power transmission tower vulnerabilities \u2014 real-time risk mapping, field inspection, and a reporting dashboard.", id: 'Sistem pemantauan kerawanan tower transmisi listrik PLN.' }, tags: { en: ['Next.js','NestJS'], id: ['Next.js','NestJS'] }, accentClass: 'from-sky-400 to-cyan-500',    bgClass: 'from-sky-100 to-cyan-100 dark:from-sky-900/40 dark:to-cyan-900/40', url: 'https://spektra.biz.id/login', imageUrl: '/porto/spektra-login.webp', order: 0 },
-  { title: { en: 'Financial Planning App',     id: 'Aplikasi Perencanaan Keuangan' }, description: { en: 'Personal finance management with budgeting, expense tracking, and investment portfolio insights.', id: 'Manajemen keuangan pribadi dengan budgeting dan pelacakan pengeluaran.' }, tags: { en: ['Android','Flutter'], id: ['Android','Flutter'] }, accentClass: 'from-amber-400 to-orange-500', bgClass: 'from-amber-100 to-orange-100 dark:from-amber-900/40 dark:to-orange-900/40', url: '', imageUrl: '', order: 1 },
-  { title: { en: 'Company Profile + CMS',       id: 'Company Profile + CMS'       }, description: { en: 'SEO-optimised company website with headless CMS, blazing-fast page loads.', id: 'Website company profile dengan headless CMS.' }, tags: { en: ['Next.js','TypeScript'], id: ['Next.js','TypeScript'] }, accentClass: 'from-blue-400 to-indigo-500',  bgClass: 'from-blue-100 to-indigo-100 dark:from-blue-900/40 dark:to-indigo-900/40', url: '', imageUrl: '', order: 2 },
-  { title: { en: 'Restaurant Ordering System',  id: 'Sistem Pemesanan Restoran'   }, description: { en: 'QR-based ordering with real-time kitchen display and table management.', id: 'Pemesanan berbasis QR dengan tampilan dapur real-time.' }, tags: { en: ['Vue.js','Express'], id: ['Vue.js','Express'] }, accentClass: 'from-emerald-400 to-teal-500', bgClass: 'from-emerald-100 to-teal-100 dark:from-emerald-900/40 dark:to-teal-900/40', url: '', imageUrl: '', order: 3 },
-  { title: { en: 'SaaS Analytics Dashboard',    id: 'Dashboard Analitik SaaS'     }, description: { en: 'Real-time analytics with role-based access, custom charts, and webhook integrations.', id: 'Analitik real-time dengan akses berbasis peran dan integrasi webhook.' }, tags: { en: ['React','Node.js'], id: ['React','Node.js'] }, accentClass: 'from-violet-400 to-purple-500', bgClass: 'from-violet-100 to-purple-100 dark:from-violet-900/40 dark:to-purple-900/40', url: '', imageUrl: '', order: 4 },
+  { id: 'port-0', title: { en: 'SPEKTRA \u2014 Transmission Risk Monitoring', id: 'SPEKTRA \u2014 Pemantauan Kerawanan Transmisi' }, description: { en: "Monitoring system for PLN's power transmission tower vulnerabilities \u2014 real-time risk mapping, field inspection, and a reporting dashboard.", id: 'Sistem pemantauan kerawanan tower transmisi listrik PLN.' }, tags: { en: ['Next.js','NestJS'], id: ['Next.js','NestJS'] }, accentClass: 'from-sky-400 to-cyan-500',    bgClass: 'from-sky-100 to-cyan-100 dark:from-sky-900/40 dark:to-cyan-900/40', url: 'https://spektra.biz.id/login', imageUrl: '/porto/spektra-login.webp', order: 0 },
+  { id: 'port-1', title: { en: 'Financial Planning App',     id: 'Aplikasi Perencanaan Keuangan' }, description: { en: 'Personal finance management with budgeting, expense tracking, and investment portfolio insights.', id: 'Manajemen keuangan pribadi dengan budgeting dan pelacakan pengeluaran.' }, tags: { en: ['Android','Flutter'], id: ['Android','Flutter'] }, accentClass: 'from-amber-400 to-orange-500', bgClass: 'from-amber-100 to-orange-100 dark:from-amber-900/40 dark:to-orange-900/40', url: '', imageUrl: '', order: 1 },
+  { id: 'port-2', title: { en: 'Company Profile + CMS',       id: 'Company Profile + CMS'       }, description: { en: 'SEO-optimised company website with headless CMS, blazing-fast page loads.', id: 'Website company profile dengan headless CMS.' }, tags: { en: ['Next.js','TypeScript'], id: ['Next.js','TypeScript'] }, accentClass: 'from-blue-400 to-indigo-500',  bgClass: 'from-blue-100 to-indigo-100 dark:from-blue-900/40 dark:to-indigo-900/40', url: '', imageUrl: '', order: 2 },
+  { id: 'port-3', title: { en: 'Restaurant Ordering System',  id: 'Sistem Pemesanan Restoran'   }, description: { en: 'QR-based ordering with real-time kitchen display and table management.', id: 'Pemesanan berbasis QR dengan tampilan dapur real-time.' }, tags: { en: ['Vue.js','Express'], id: ['Vue.js','Express'] }, accentClass: 'from-emerald-400 to-teal-500', bgClass: 'from-emerald-100 to-teal-100 dark:from-emerald-900/40 dark:to-teal-900/40', url: '', imageUrl: '', order: 3 },
+  { id: 'port-4', title: { en: 'SaaS Analytics Dashboard',    id: 'Dashboard Analitik SaaS'     }, description: { en: 'Real-time analytics with role-based access, custom charts, and webhook integrations.', id: 'Analitik real-time dengan akses berbasis peran dan integrasi webhook.' }, tags: { en: ['React','Node.js'], id: ['React','Node.js'] }, accentClass: 'from-violet-400 to-purple-500', bgClass: 'from-violet-100 to-purple-100 dark:from-violet-900/40 dark:to-purple-900/40', url: '', imageUrl: '', order: 4 },
 ];
 
 export const fallbackCta = {

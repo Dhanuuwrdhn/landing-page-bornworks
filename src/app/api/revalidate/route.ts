@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
 
   // Cache tag
   if (typeof b.tag === 'string') {
-    revalidateTag(b.tag);
+    revalidateTag(b.tag, 'max');
     return NextResponse.json({ revalidated: true, tag: b.tag });
   }
 
