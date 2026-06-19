@@ -1,0 +1,10 @@
+# gitleaks ignore file
+# Use this to suppress known false positives or intentionally-redacted historical references.
+# Each line: <FINGERPRINT>:<FILE_PATH> or just <FILE_PATH>
+#
+# Format reference: https://github.com/gitleaks/gitleaks/blob/master/README.md
+
+# 2026-06-19 incident doc references rotated credential values
+# (already removed from working tree, but appear in older commit history)
+# These values are NO LONGER VALID — the credentials have been rotated.
+docs/security-incidents/2026-06-19-github-secret-leak.md
