@@ -139,4 +139,4 @@ curl -sS -o /dev/null -w '%{http_code}' https://bornworks.biz.id
 # Returns: 200
 ```
 
-**Network note:** born2works and bornworks-cms must be on the same Docker bridge network. The `docker network connect born2works_default bornworks-cms` command (run manually or via a compose file that defines a shared network) makes the CMS reachable at `bornworks-cms:3000` from the born2works container.
+**Network note:** born2works and bornworks-cms must be on the same Docker bridge network. The `docker network connect born2works_default bornworks-cms` command (run manually or via a compose file that defines a shared network) makes the CMS reachable at `bornworks-cms:3000` from the born2works container. This connection persists across container restarts but NOT across `docker compose down && up` for bornworks-cms (the container must be re-connected after recreation). A permanent fix is to add `born2works_default` as an external network to bornworks-cms's docker-compose.yml.
