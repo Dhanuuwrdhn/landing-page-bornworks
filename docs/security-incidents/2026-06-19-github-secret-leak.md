@@ -159,7 +159,7 @@ Ran `gitleaks detect --source` on 10 high-priority public repos:
 
 | Secret | New Value | File | Status |
 |---|---|---|---|
-| `SEED_ADMIN_PASSWORD` | `yinpGAbp2oqpk2MkhcN1rN3L5R7PrQN` (31 char, openssl rand -base64 24) | `~/work/bornworks-cms/.env` | Live, login verified |
-| `REVALIDATE_SECRET` | `ab59ce97760e7987dc08718a313f68b9` (32 char, openssl rand -hex 16) | `~/work/born2works/.env` | Live, revalidate verified |
+| `SEED_ADMIN_PASSWORD` | _See 1Password: Born2Works / CMS Admin_ | `~/work/bornworks-cms/.env` | Live, login verified |
+| `REVALIDATE_SECRET` | _See 1Password: Born2Works / Revalidate Webhook_ | `~/work/born2works/.env` | Live, revalidate verified |
 
-Both also backed up at `~/.secrets/bornworks-cms-admin.txt` (chmod 600) and in this document.
+Both also backed up at `~/.secrets/bornworks-cms-admin.txt` (chmod 600). Move to 1Password ASAP, then delete the file.
