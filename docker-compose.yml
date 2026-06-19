@@ -17,3 +17,11 @@ services:
       CMS_ENABLED:  ${CMS_ENABLED:-true}
       CMS_API_URL:  ${CMS_API_URL:-http://bornworks-cms:3000}
       REVALIDATE_SECRET: ${REVALIDATE_SECRET:-}
+    networks:
+      - default
+      - bornworks-shared
+
+networks:
+  bornworks-shared:
+    external: true
+    name: bornworks-shared
