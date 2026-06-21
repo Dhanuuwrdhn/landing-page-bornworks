@@ -191,7 +191,7 @@ curl -sS -o /dev/null -w '%{http_code}' https://bornworks.biz.id
 ### What was delivered
 - **File:** `docs/seo-ux-spec.md` — comprehensive UX design specification covering all 7 sections
 - **Mockup:** `mockup.html` in task workspace — visual mockup of all 3 page templates (desktop + mobile views)
-- **Status:** Committed at `<commit-sha>` on `main`
+- **Status:** Committed at `05165f6` on `main`
 
 ### UX Spec summary
 
