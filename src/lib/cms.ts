@@ -15,6 +15,37 @@ import { HeroSection } from '@/types/cms';
 const CMS_URL  = process.env.CMS_API_URL  || 'http://127.0.0.1:3010';
 const ENABLED  = process.env.CMS_ENABLED !== 'false';
 
+/**
+ * Resolve a media URL returned by the CMS into a fully-qualified URL the
+ * next.js server can fetch. CMS stores URLs as either:
+ *   - absolute:   https://cms.bornworks.biz.id/uploads/foo.png
+ *   - relative:   /uploads/foo.png   (resolve against the public CMS URL)
+ *   - same-origin 127.0.0.1:3010    (also common; rewrite to public host)
+ */
+export function resolveMediaUrl(url: string): string {
+  if (!url) return url;
+  if (/^https?:\/\//i.test(url)) {
+    // If the URL points to the private docker hostname, rewrite to the public host
+    try {
+      const u = new URL(url);
+      if (u.hostname === '127.0.0.1' || u.hostname === 'localhost' || u.hostname === 'cms-db') {
+        const publicHost = process.env.NEXT_PUBLIC_SITE_URL
+          ? new URL(process.env.NEXT_PUBLIC_SITE_URL).host
+          : 'cms.bornworks.biz.id';
+        u.host = publicHost;
+        u.protocol = 'https:';
+        return u.toString();
+      }
+    } catch {/* fall through */}
+    return url;
+  }
+  // relative path — resolve against the public CMS host
+  const publicBase = process.env.NEXT_PUBLIC_SITE_URL
+    ? process.env.NEXT_PUBLIC_SITE_URL.replace(/^https?:\/\/[^/]+/, 'https://cms.bornworks.biz.id')
+    : 'https://cms.bornworks.biz.id';
+  return `${publicBase}${url.startsWith('/') ? url : '/' + url}`;
+}
+
 /* ─── Fetch helper ─────────────────────────────────────── */
 async function cmsFetch<T>(path: string): Promise<T | null> {
   if (!ENABLED) return null;
@@ -43,6 +74,10 @@ export const fallbackHero = {
     en: 'From idea to launch — we craft web apps, mobile apps, and SaaS platforms.',
     id: 'Dari ide hingga peluncuran — kami membangun web app, mobile app, dan platform SaaS.',
   },
+  subtitle2: {
+    en: 'All without slowing down your business.',
+    id: 'Tanpa mengganggu bisnis utama Anda.',
+  },
   primaryCta:   { label: { en: 'Start a Project', id: 'Mulai Project' },   href: '#contact'  },
   secondaryCta: { label: { en: 'See Our Work',   id: 'Lihat Karya Kami' }, href: '#portfolio' },
 };
@@ -58,14 +93,14 @@ export const fallbackAbout = {
   badge: { en: 'Based in Indonesia \u00b7 Est. 2024', id: 'Berbasis di Indonesia \u00b7 Berdiri 2024' },
   values: {
     en: [
-      { icon: 'Zap',    title: { en: 'Move fast',      id: 'Bergerak cepat'     }, desc: { en: 'We ship early and iterate quickly. No over-engineering, no endless planning.', id: 'Kami ship lebih awal dan iterasi cepat. Tanpa over-engineering.' } },
-      { icon: 'Shield', title: { en: 'Build right',    id: 'Bangun dengan benar' }, desc: { en: 'Quality code, tested features, and clean architecture \u2014 every time.', id: 'Kode berkualitas, fitur teruji, dan arsitektur bersih.' } },
-      { icon: 'Eye',    title: { en: 'Stay honest',   id: 'Tetap jujur'         }, desc: { en: 'Regular updates, transparent timelines, no surprises.', id: 'Update rutin, timeline transparan, tanpa kejutan.' } },
+      { icon: 'Zap',    title: 'Move fast',    desc: 'We ship early and iterate quickly. No over-engineering, no endless planning.' },
+      { icon: 'Shield', title: 'Build right',  desc: 'Quality code, tested features, and clean architecture \u2014 every time.' },
+      { icon: 'Eye',    title: 'Stay honest',  desc: 'Regular updates, transparent timelines, no surprises.' },
     ],
     id: [
-      { icon: 'Zap',    title: { en: 'Move fast',      id: 'Bergerak cepat'     }, desc: { en: 'We ship early and iterate quickly. No over-engineering, no endless planning.', id: 'Kami ship lebih awal dan iterasi cepat. Tanpa over-engineering.' } },
-      { icon: 'Shield', title: { en: 'Build right',    id: 'Bangun dengan benar' }, desc: { en: 'Quality code, tested features, and clean architecture \u2014 every time.', id: 'Kode berkualitas, fitur teruji, dan arsitektur bersih.' } },
-      { icon: 'Eye',    title: { en: 'Stay honest',   id: 'Tetap jujur'         }, desc: { en: 'Regular updates, transparent timelines, no surprises.', id: 'Update rutin, timeline transparan, tanpa kejutan.' } },
+      { icon: 'Zap',    title: 'Bergerak cepat',     desc: 'Kami ship lebih awal dan iterasi cepat. Tanpa over-engineering atau perencanaan yang berlarut.' },
+      { icon: 'Shield', title: 'Bangun dengan benar', desc: 'Kode berkualitas, fitur teruji, dan arsitektur bersih \u2014 setiap saat.' },
+      { icon: 'Eye',    title: 'Tetap jujur',         desc: 'Update rutin, timeline transparan, tanpa kejutan.' },
     ],
   },
 };
@@ -149,6 +184,21 @@ export const fallbackFooter = {
   },
 };
 
+export const fallbackSectionLabels = {
+  services: {
+    en: { label: 'Our Services', sub: 'What We Build' },
+    id: { label: 'Layanan Kami', sub: 'Yang Kami Bangun' },
+  },
+  process: {
+    en: { label: 'How We Work', sub: 'Our Process' },
+    id: { label: 'Cara Kami Bekerja', sub: 'Proses Kami' },
+  },
+  portfolio: {
+    en: { label: 'Our Work', view: 'View Project' },
+    id: { label: 'Karya Kami', view: 'Lihat Project' },
+  },
+};
+
 /* ─── API fetch functions ──────────────────────────────── */
 
 export async function getHero() {
@@ -190,9 +240,57 @@ export async function getFooter() {
   return data ?? fallbackFooter;
 }
 
+export async function getSectionLabels() {
+  const data = await cmsFetch<typeof fallbackSectionLabels>('/section-label');
+  return data ?? fallbackSectionLabels;
+}
+
+/* ─── SEO (OG / Twitter card defaults) ──────────────── */
+
+type SeoShape = {
+  title: { en: string; id: string };
+  description: { en: string; id: string };
+  imageUrl: string | null;
+  siteUrl: string;
+  defaultLang: string;
+};
+
+export async function getSeo(): Promise<SeoShape> {
+  const data = await cmsFetch<{
+    seoTitle?: { en?: string; id?: string } | null;
+    seoDescription?: { en?: string; id?: string } | null;
+    seoImage?: { url?: string } | null;
+    siteUrl?: string;
+    defaultLang?: string;
+  }>('/site-settings');
+
+  return {
+    title: {
+      en: data?.seoTitle?.en?.trim() || FALLBACK_TITLE.en,
+      id: data?.seoTitle?.id?.trim() || FALLBACK_TITLE.id,
+    },
+    description: {
+      en: data?.seoDescription?.en?.trim() || FALLBACK_DESCRIPTION.en,
+      id: data?.seoDescription?.id?.trim() || FALLBACK_DESCRIPTION.id,
+    },
+    imageUrl: data?.seoImage?.url || null,
+    siteUrl: data?.siteUrl || process.env.NEXT_PUBLIC_SITE_URL || 'https://bornworks.biz.id',
+    defaultLang: data?.defaultLang || 'en',
+  };
+}
+
+const FALLBACK_TITLE = {
+  en: 'bornworks | Software House Indonesia — Web App, Mobile App & SaaS',
+  id: 'bornworks | Software House Indonesia — Web App, Mobile App & SaaS',
+};
+const FALLBACK_DESCRIPTION = {
+  en: 'Trusted software house in Indonesia. We build web apps, Android mobile apps, and SaaS products — from idea to launch. Free consultation, transparent process.',
+  id: 'Software house terpercaya di Indonesia. Kami bangun web app, mobile app Android, dan produk SaaS — dari ide sampai launch. Konsultasi gratis, proses transparan.',
+};
+
 /* ─── Page-level fetch (parallel, for server components) ─── */
 export async function getCmsPageData() {
-  const [hero, about, services, process, portfolio, cta, footer] = await Promise.all([
+  const [hero, about, services, process, portfolio, cta, footer, sectionLabels] = await Promise.all([
     getHero(),
     getAbout(),
     getServices(),
@@ -200,6 +298,7 @@ export async function getCmsPageData() {
     getPortfolio(),
     getCta(),
     getFooter(),
+    getSectionLabels(),
   ]);
-  return { hero, about, services, process, portfolio, cta, footer };
+  return { hero, about, services, process, portfolio, cta, footer, sectionLabels };
 }

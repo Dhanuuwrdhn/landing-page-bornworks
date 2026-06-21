@@ -25,6 +25,7 @@ export interface HeroSection {
     id: string[];
   };
   subtitle:         LocalizedString;
+  subtitle2?:       LocalizedString;
   primaryCta:       HeroCta;
   secondaryCta:     HeroCta;
   stats?:           Json;
@@ -34,8 +35,8 @@ export interface HeroSection {
 /* ── About ───────────────────────────────────────────── */
 export interface AboutValue {
   icon:  string;
-  title: LocalizedString;
-  desc:  LocalizedString;
+  title: string;
+  desc:  string;
 }
 
 export interface AboutSection {
@@ -135,13 +136,23 @@ export interface SiteSettings {
   updatedAt?:     string;
 }
 
+/* ── Section Labels ───────────────────────────────────── */
+export interface SectionLabels {
+  id?:        number;
+  services:  { en: { label: string; sub: string }; id: { label: string; sub: string } };
+  process:   { en: { label: string; sub: string }; id: { label: string; sub: string } };
+  portfolio: { en: { label: string; view: string }; id: { label: string; view: string } };
+  updatedAt?: string;
+}
+
 /* ── Full page data (returned by getCmsPageData) ──────── */
 export interface CmsPageData {
-  hero:      HeroSection;
-  about:     AboutSection;
-  services:  ServiceItem[];
-  process:   ProcessStep[];
-  portfolio: PortfolioItem[];
-  cta:       CtaSection;
-  footer:    FooterSection;
+  hero:           HeroSection;
+  about:          AboutSection;
+  services:       ServiceItem[];
+  process:        ProcessStep[];
+  portfolio:       PortfolioItem[];
+  cta:            CtaSection;
+  footer:         FooterSection;
+  sectionLabels?: SectionLabels;
 }

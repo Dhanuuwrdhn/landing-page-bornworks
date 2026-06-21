@@ -86,10 +86,10 @@ export default function About({ about }: AboutProps) {
                   </div>
                   <div>
                     <h3 className="text-sm font-bold text-brand-dark dark:text-white mb-0.5">
-                      {v.title?.[lang] ?? v.title?.en ?? ''}
+                      {v.title ?? ''}
                     </h3>
                     <p className="text-sm text-brand-muted dark:text-white/45 leading-relaxed">
-                      {v.desc?.[lang] ?? v.desc?.en ?? ''}
+                      {v.desc ?? ''}
                     </p>
                   </div>
                 </m.div>
