@@ -183,3 +183,102 @@ curl -sS -o /dev/null -w '%{http_code}' https://bornworks.biz.id
 ### Repo
 - **URL:** https://github.com/Dhanuuwrdhn/landing-page-bornworks
 - **Last commit:** `7f8a685` — `docs: add seo-content-brief.md — M1 W1 deliverable`
+
+---
+
+## SEO Sprint Handoff (U1 — UI/UX Design)
+
+### What was delivered
+- **File:** `docs/seo-ux-spec.md` — comprehensive UX design specification covering all 7 sections
+- **Mockup:** `mockup.html` in task workspace — visual mockup of all 3 page templates (desktop + mobile views)
+- **Status:** Committed at `<commit-sha>` on `main`
+
+### UX Spec summary
+
+#### Information Architecture
+- 9 pages total: 3 services + 5 portfolio + 1 FAQ (each x2 for EN/ID)
+- Bilingual URL strategy: `/services/web-app` (EN) ↔ `/id/services/web-app` (ID)
+- New footer columns: Services (linking to 3 service pages) + Resources (FAQ + future blog)
+- Language switcher: preserves current path when switching locale (no page reload)
+
+#### Page Templates (3 types)
+
+**Template 1 — Service Page** (`/services/[slug]`):
+- Hero: two-column (text left, geometric visual right), H1 + subtitle + CTA
+- Features grid: 3–4 `glass-card` icon + title + description cards
+- Process timeline: horizontal 4-step (vertical on mobile), amber connector line
+- Why Bornworks: two-column with amber accent stat block
+- FAQ accordion: 3–5 collapsible Q&A (single-open mode)
+- Case studies carousel: 2–3 related portfolio cards, horizontal scroll
+- CTA block: dark bg with animated blobs (mirrors existing `CTA.tsx`)
+
+**Template 2 — Case Study Page** (`/portfolio/[slug]`):
+- Hero: project name, meta row (industry, year, client, tags)
+- Full-width cover image
+- Alternating left/right content sections: Challenge → Approach → Solution
+- Results: 3–4 `MetricCard` components (amber number + muted label)
+- Tech stack badge grid: `font-mono` pills
+- Testimonial block (if available)
+- Related case studies (2–3 cards)
+
+**Template 3 — FAQ Page** (`/faq`):
+- Centered hero: H1 + subtitle
+- Category filter: horizontal pill tabs (All / Services / Process / Trust / Comparison)
+- FAQ accordion: 8–10 items, single-open, category tags, smooth height animation
+- CTA form: dark section, name + email + textarea + submit
+
+#### Component Inventory
+
+| Component | Type | Source |
+|---|---|---|
+| `Breadcrumb` | New | `aria-label="Breadcrumb"`, ol/li, JSON-LD schema |
+| `ServiceHero` | New | Based on `Hero.tsx` (no typewriter) |
+| `FeaturesGrid` | New | Maps over `glass-card` pattern |
+| `ProcessTimeline` | New | Based on `Process.tsx` GSAP ScrollTrigger |
+| `FaqAccordion` | New | shadcn/ui Accordion + single-open logic |
+| `CaseStudyCarousel` | New | CSS scroll-snap, dot nav, simplified `Portfolio.tsx` |
+| `MetricCard` | New | Amber number + muted label in `glass-card` |
+| `TechStackBadge` | New | `font-mono text-xs` pill |
+| `CategoryFilter` | New | shadcn/ui Tabs, horizontal pill style |
+| `RelatedContent` | New | Grid of cards, reusable |
+| `MobileDrawer` | New | Drawer with accordion sections, focus trap |
+| `Navbar` | Extend | Existing `Navbar.tsx` + dropdown menus + ARIA menu |
+| `Footer` | Extend | Existing `Footer.tsx` + two new link columns |
+| `CTA` | Reuse | Existing `CTA.tsx` as-is for all page CTAs |
+
+#### Navigation Update
+- Desktop navbar: dropdown menus for Services (3 items) and Portfolio (5 items)
+- Mobile: full-height right-side drawer with accordion sections
+- Footer: Services column (3 service links) + Resources column (FAQ, future blog)
+- Language switcher: `EN | ID` toggle, preserves path prefix, no page reload
+
+#### Key Design Tokens (from `globals.css`)
+```
+--color-brand-amber: #F59E0B
+--color-brand-amber-light: #FEF3C7
+--color-brand-amber-dark: #D97706
+--color-brand-dark: #111827 (light) / #0a0e1a (dark)
+--color-brand-light: #F9FAFB
+--color-brand-muted: #6B7280 (light) / rgba(255,255,255,0.5) (dark)
+--font-sans: Inter
+--font-mono: JetBrains Mono
+```
+Glass utilities (`glass`, `glass-card`, `glass-strong`) already defined in globals.css — reuse them.
+
+### Engineering Handoff Notes (from UX)
+
+1. **No new color tokens** — all components use existing `@theme inline` tokens from globals.css
+2. **Tailwind v4** — this project uses Tailwind v4 with `@theme inline` in globals.css (no tailwind.config.js). Do NOT create a tailwind.config.js — add any new tokens directly to `@theme inline` in globals.css
+3. **Dark mode** — all components use `.dark` class selector on `<html>`; all colors must have light and dark values
+4. **shadcn/ui** — NOT yet installed. If Engineer chooses to use it, run `npx shadcn@latest init` first, then `npx shadcn@latest add accordion tabs` for FAQ components. Otherwise build from raw Tailwind
+5. **framer-motion** — already installed; use `whileInView` with `viewport={{ once: true }}` for scroll animations (same pattern as existing components)
+6. **Icons** — `lucide-react` already in use; import from there
+7. **LCP constraint** — all hero/cover images must be WebP, lazy-loaded, max 200KB. No full-bleed video.
+8. **ID text overflow** — ID text is ~15–20% longer than EN. Test all text containers with ID content; use `text-balance` on headings, allow wrapping at all breakpoints
+9. **hreflang** — must be on every page `<head>`: `<link rel="alternate" hreflang="en">` + `<link rel="alternate" hreflang="id">` + `<link rel="alternate" hreflang="x-default">`
+10. **JSON-LD schemas** — add per page: `BreadcrumbList` (all pages), `Service` (service pages), `Article` (case study pages), `FAQPage` (FAQ page)
+
+### Repo
+- **URL:** https://github.com/Dhanuuwrdhn/landing-page-bornworks
+- **Spec file:** `docs/seo-ux-spec.md` — committed at `<commit-sha>`
+- **Mockup:** `mockup.html` (task workspace, not committed to repo)
