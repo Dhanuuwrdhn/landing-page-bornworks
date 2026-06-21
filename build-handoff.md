@@ -140,3 +140,46 @@ curl -sS -o /dev/null -w '%{http_code}' https://bornworks.biz.id
 ```
 
 **Network note:** born2works and bornworks-cms must be on the same Docker bridge network. The `docker network connect born2works_default bornworks-cms` command (run manually or via a compose file that defines a shared network) makes the CMS reachable at `bornworks-cms:3000` from the born2works container. This connection persists across container restarts but NOT across `docker compose down && up` for bornworks-cms (the container must be re-connected after recreation). A permanent fix is to add `born2works_default` as an external network to bornworks-cms's docker-compose.yml.
+
+---
+
+## SEO Sprint Handoff (M1 — Marketing)
+
+### What was delivered
+- **File:** `docs/seo-content-brief.md` — 57KB, ~2,300 lines, all 5 sections complete
+- **Status:** Committed at `7f8a685` on `main`
+
+### Content brief summary
+| Section | Coverage |
+|---------|----------|
+| Section A: Keyword Universe | 3 service clusters (S1/S2/S3) + 5 portfolio clusters + FAQ cluster; quick-win vs long-term keywords identified |
+| Section B: Per-Page Briefs | All 9 pages briefed in both EN + ID (18 URL variants); title, meta, H1, H2/H3 outline, word count, content sections, visuals, schema, internal links, external links, CTA |
+| Section C: FAQ Brief | 8 Q&A per language; natural ID (not translation); FAQPage schema included |
+| Section D: Content Roadmap | Writer assignments (engineer, Dhanu, Bagas); 18 content pieces; ~20,400 total words; priority order + schedule |
+| Section E: Measurement Plan | 90-day KPIs; baseline=0; quick-win keyword tracking; GSC + Bing setup |
+
+### Quick-win keywords (for early ranking wins)
+1. `Next.js developer Indonesia` — EN — /services/web-app — target top 10
+2. `jasa bikin aplikasi Android` — ID — /id/services/mobile-app — target top 5
+3. `jasa pengembangan SaaS` — ID — /id/services/saas — target top 5
+4. `Flutter developer Indonesia` — EN — /services/mobile-app — target top 10
+5. `QR restaurant ordering system` — EN — /portfolio/restaurant-ordering — target top 10
+6. `jasa company profile + CMS` — ID — /id/portfolio/company-profile-cms — target top 5
+
+### Handoff notes for engineer (E1)
+1. **Schema.org** — Each service page needs individual `Service` schema (currently only `ItemList` exists). Portfolio pages need `Article` schema. FAQ page needs `FAQPage` schema. All pages need `BreadcrumbList`. See Appendix in seo-content-brief.md for JSON-LD examples.
+2. **Hreflang** — All 18 pages need correct hreflang tags. EN page (`/path`) gets `hreflang="id"` (pointing to ID version) + `hreflang="x-default"` (pointing to EN default). ID page (`/id/path`) gets `hreflang="en"` + `hreflang="id"` (self) + `hreflang="x-default"`. See Appendix in seo-content-brief.md.
+3. **Sitemap** — Submit 18 URLs to GSC. Single sitemap with hreflang annotations per entry.
+4. **Internal links** — Implement the cross-linking map (Section B). Add a "Related Services" or "You might also like" component at bottom of each page that renders these cross-links.
+5. **FAQ page** — Implement `/faq` and `/id/faq` with FAQPage schema. 8 Q&A per language. Short answers (40-80 words each). Schema.org FAQPage markup required for featured snippet eligibility.
+
+### Handoff notes for UX (U1)
+1. Each service page needs a template with: hero section, content sections (5-8), FAQ section, CTA section, sidebar/related content
+2. Each portfolio page needs: case study layout (Challenge → Approach → Solution → Results → Tech stack → CTA)
+3. FAQ page needs: accordion-style Q&A with schema-ready markup
+4. All pages need: breadcrumb navigation, language toggle persistence, mobile-responsive layout
+5. See Section B for visual suggestions per page (screenshots, diagrams, code snippets)
+
+### Repo
+- **URL:** https://github.com/Dhanuuwrdhn/landing-page-bornworks
+- **Last commit:** `7f8a685` — `docs: add seo-content-brief.md — M1 W1 deliverable`
