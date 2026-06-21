@@ -282,3 +282,42 @@ Glass utilities (`glass`, `glass-card`, `glass-strong`) already defined in globa
 - **URL:** https://github.com/Dhanuuwrdhn/landing-page-bornworks
 - **Spec file:** `docs/seo-ux-spec.md` — committed at `<commit-sha>`
 - **Mockup:** `mockup.html` (task workspace, not committed to repo)
+
+---
+
+## SEO Upgrade T1 Handoff Summary (2026-06-21 — W1)
+
+**Spec owner:** Rizki (CTO) — kanban task `t_6d591428`
+**Spec file:** [`docs/seo-tech-spec.md`](docs/seo-tech-spec.md) (7,421 words, 12 sections, committed at `16bb1aa`)
+
+### What this spec locks
+1. **CMS schema (additive):** 4 new Prisma models (`ServicePage`, `PortfolioCaseStudy`, `FaqItem`) + extension to existing `SiteSetting` singleton for `LocalBusiness` fields. Zero breaking changes to existing models. Migration is `prisma migrate dev --name add-seo-pages`.
+2. **Routing:** Next.js 16 App Router under `app/[lang]/` — `/services/web-app` (EN, default, x-default) and `/id/services/web-app` (ID) share one component per page. **No redirect** for bare paths — Next.js 16 `proxy.ts` rewrites bare paths to `/[lang=en]/...` internally so the canonical URL stays locale-less.
+3. **Per-page schema.org:** `Service` (service pages) + `CreativeWork` (case studies) + `FAQPage` (FAQ + inline service FAQs) + `BreadcrumbList` (all inner pages). Global `LocalBusiness` upgrade from existing `Organization` adds Jakarta address, geo, opening hours, area served, price range, sameAs.
+4. **Sitemap:** single `sitemap.xml` with all 18 URLs + per-URL `<xhtml:link rel="alternate" hreflang>` triplet (`en` + `id` + `x-default`).
+5. **Revalidation:** `POST /api/revalidate` extended to accept `{ entity, slug }` shape (additive, backward-compatible). CMS admin saves trigger granular revalidation of both locale variants of the affected page.
+6. **Migration:** 9-step additive rollout. Existing single-page stays live until step 5 (home cutover).
+
+### Engineering handoff notes (from CTO)
+1. **Next.js 16 has breaking changes** — `middleware.ts` is renamed to `proxy.ts` (deprecated alias still works but new code must use `proxy.ts`); `params` is now `Promise<{...}>` and must be `await`ed in every page/layout/route. Read `node_modules/next/dist/docs/01-app/03-api-reference/03-file-conventions/proxy.md` before writing proxy code.
+2. **The existing client-side `LanguageContext` (localStorage) is broken for SEO pages.** New SEO pages MUST be URL-driven. Keep the context only as a fallback for the existing single-page home until W3 cutover. The `LanguageSwitcher.tsx` must `router.push(localizedPath(...))` instead of toggling context state.
+3. **`SiteSetting.defaultLang` type changes** from `String` to `Locale` enum. Pre-flight check before migration: `SELECT DISTINCT "defaultLang" FROM "SiteSetting";` — confirm only `'en'` / `'id'`. Prisma generates a safe `USING "defaultLang"::"Locale"` cast.
+4. **Use the spec's `buildMetadata()` helper as the single source of truth** for every page's `<head>` metadata + hreflang. Don't hand-roll per-page `<head>` blocks — that's how hreflang errors creep in.
+5. **Performance budget: client JS for each new page must be < 100 KB First Load JS.** Use server components exclusively for all new pages; only `CategoryFilter` (FAQ tabs) and `FaqAccordion` (collapse interaction) need `"use client"`. Keep `gsap` / `framer-motion` imports out of `layout.tsx` and page server components — they stay in client component children only.
+6. **`opennextjs/cloudflare` cache propagation caveat:** revalidation webhook purges Cloudflare edge cache within ~30 s. Acceptable for marketing site. Multi-replica Docker deploys use per-process ISR cache; if scaling out, add Redis-backed `revalidateTag` shared store (out of scope this sprint).
+7. **Anchor link backward compatibility:** the new home must keep `<a id="services">`, `<a id="portfolio">`, `<a id="about">`, `<a id="contact">` anchor IDs identical to the current single-page so existing inbound links from emails / ads don't break.
+
+### Open questions for owner (must answer before E1 starts)
+1. `LocalBusiness.addressLocality` — confirm "Jakarta Selatan" vs other.
+2. Geo coordinates (lat/long) for the office — provide or skip `geo`.
+3. `sameAs` URLs — LinkedIn / GitHub / Twitter / Instagram company pages.
+4. GA4 measurement ID — fresh install or reuse existing?
+5. Logo file (high-res PNG/SVG, ≥1200×630) — drop in `public/`.
+6. Translation direction — write ID first or parallel?
+
+### Task handoff
+- **Next task (W2):** E1 — Engineer implements this spec + the UX spec + integrates Marketing's seed content from `seo-content-brief.md`.
+- **QA task (W3):** Q1 — verifies all 18 URLs with Google Rich Results Test + Search Console URL Inspection + hreflang validation.
+- **DevOps task (W4):** D1 — submits sitemap to Google Search Console + Bing Webmaster, monitors initial indexing.
+
+*This handoff added 2026-06-21 by CTO (Rizki).*
